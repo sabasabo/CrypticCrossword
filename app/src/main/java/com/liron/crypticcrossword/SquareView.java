@@ -36,6 +36,7 @@ public class SquareView extends View {
 
     public SquareView(Context context) {
         super(context);
+        setTag(getContext().getString(R.string.squareViewTag));
         paint = new Paint();
         setFocusable(true); // necessary for getting the touch events
         canvas = new Canvas();
@@ -215,7 +216,6 @@ public class SquareView extends View {
 
         private static int count = 0;
         private Bitmap bitmap;
-        private Context mContext;
         private Point point;
         private int id;
 
@@ -223,7 +223,6 @@ public class SquareView extends View {
             id = count++;
             bitmap = BitmapFactory.decodeResource(context.getResources(),
                     resourceId);
-            mContext = context;
             this.point = point;
         }
 

@@ -20,7 +20,7 @@ public class PinkButton {
     private SquareView squareView;
 
     public PinkButton(Activity activity) {
-        this.floatingButton = (FloatingActionButton) activity.findViewById(R.id.fab);
+        this.floatingButton = (FloatingActionButton) activity.findViewById(R.id.floatingButton);
         this.activity = activity;
         this.buttonActions = new ArrayList<>(Arrays.asList(new Select(), new Ok()));
         squareView = new SquareView(activity);
