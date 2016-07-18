@@ -18,44 +18,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        enableZoom();
         PinkButton pinkButton = new PinkButton(this);
 
     }
-
-//    private void enableZoom() {
-//        mScaleDetector = new ScaleGestureDetector(this, new ScaleListener());
-//        FrameLayout layout = (FrameLayout) findViewById(R.id.layout);
-//        layout.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                mScaleDetector.onTouchEvent(event);
-//                return true;
-//            }
-//        });
-//
-//    }
-
-//    private void saveMidPoint(MotionEvent event) {
-//        mid.x = (event.getX(0) + event.getX(1)) / 2;
-//        mid.y = (event.getY(0) + event.getY(1)) / 2;
-//    }
-//
-//    private float fingersDistance(MotionEvent event) {
-//        return (float) Math.sqrt(Math.abs(
-//                event.getX(0) - event.getX(1))
-//                + Math.abs(event.getY(0) - event.getY(1)));
-//    }
-
-    // TODO: change to the lifecircle after drawing the content.xml
-//    private void onFirstClick() {
-//        GridLayout gridLayout = (GridLayout) findViewById(R.id.grid);
-//        for (int i = 0; i < NUM_OF_CELLS; i++) {
-//            EditText child = (EditText) gridLayout.getChildAt(i);
-//            child.requestFocus();
-//        }
-//
-//    }
 
 
     @Override

@@ -263,13 +263,13 @@ public class SquareView extends View {
         }
     }
 
-    public class SquareLocation {
+    public static class SquareLocation {
         public int left;
         public int right;
         public int top;
         public int bottom;
 
-        private SquareLocation(int left, int right, int top, int bottom) {
+        public SquareLocation(int left, int right, int top, int bottom) {
             this.left = left;
             this.right = right;
             this.top = top;

@@ -24,11 +24,17 @@ public class BlackPixelIdentifier {
     }
 
     private int getYSample(View view) {
-        return (int) (gridLayoutView.getBottom() + view.getY() + view.getHeight() / 2);
+        //int[] location = new int[2];
+        //view.getLocationOnScreen(location);
+        //return location[1] + view.getHeight() / 2;
+        return (int) view.getY() + 20;
     }
 
     private int getXSample(View view) {
-        return (int) (gridLayoutView.getLeft() + view.getX() + view.getWidth() / 2);
+        //       int[] location = new int[2];
+        //       view.getLocationOnScreen(location);
+        //       return location[0] + view.getWidth() / 2;
+        return (int) view.getX() + 20;
     }
 
     public int getMaxRGB(int touchColor) {
