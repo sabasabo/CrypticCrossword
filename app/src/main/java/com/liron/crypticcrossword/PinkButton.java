@@ -68,7 +68,7 @@ public class PinkButton {
         @Override
         public void doAction() {
 
-            GridLayoutView gridView = new GridLayoutView(activity, NUM_OF_CELLS, squareView.getGridDestination());
+            GridLayoutView gridView = new GridLayoutView(activity, NUM_OF_CELLS, squareView.getSquareLocation());
             ((FrameLayout) activity.findViewById(R.id.layout)).removeView(squareView);
         }
 

@@ -38,7 +38,7 @@ public class GridLayoutView extends GridLayout {
         }
         final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParams.rightMargin = parentLayout.getRight() - location.right;
-        layoutParams.topMargin = location.bottom; // - parentLayout.getTop();
+        layoutParams.topMargin = location.top; // - parentLayout.getTop();
         final GridLayoutView[] gridLayoutViews = new GridLayoutView[1];
         gridLayoutViews[0] = this;
 //        this.setBackgroundColor(R.color.colorAccent);

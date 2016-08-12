@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,8 +24,10 @@ public class SquareView extends View {
     public static final int DEFAULT_BALLS_DISTANCE = 200;
     public static final String RECTANGLE_EDGE_COLOR = "#AADB1255";
     public static final String RECTANGLE_AREA_COLOR = "#55DB1255";
-    public static final int[] circleCorners = new int[]{R.drawable.up_left,
+    public static final int[] CIRCLE_CORNERS = new int[]{R.drawable.up_left,
             R.drawable.bottom_left, R.drawable.bottom_right, R.drawable.up_right};
+
+    private final boolean IS_USING_RECT = true;
     /**
      * point1 and point 3 are of same group and same as point 2 and point4
      */
@@ -71,17 +74,26 @@ public class SquareView extends View {
         paint.setStrokeWidth(6);
 
 
-        Path path = new Path();
         final ColorBall colorBall1 = colorBalls.get(0);
         final ColorBall colorBall2 = colorBalls.get(1);
         final ColorBall colorBall3 = colorBalls.get(2);
         final ColorBall colorBall4 = colorBalls.get(3);
-        path.moveTo(colorBall1.getXCenter(), colorBall1.getYCenter());
-        path.lineTo(colorBall2.getXCenter(), colorBall2.getYCenter());
-        path.lineTo(colorBall3.getXCenter(), colorBall3.getYCenter());
-        path.lineTo(colorBall4.getXCenter(), colorBall4.getYCenter());
-        path.close();
-        canvas.drawPath(path, paint);
+        if (IS_USING_RECT) {
+            Rect rect = new Rect();
+            rect.top = colorBall4.getYCenter();
+            rect.bottom = colorBall2.getYCenter();
+            rect.left = colorBall2.getXCenter();
+            rect.right = colorBall4.getXCenter();
+            canvas.drawRect(rect, paint);
+        } else {
+            Path path = new Path();
+            path.moveTo(colorBall1.getXCenter(), colorBall1.getYCenter());
+            path.lineTo(colorBall2.getXCenter(), colorBall2.getYCenter());
+            path.lineTo(colorBall3.getXCenter(), colorBall3.getYCenter());
+            path.lineTo(colorBall4.getXCenter(), colorBall4.getYCenter());
+            path.close();
+            canvas.drawPath(path, paint);
+        }
 //        canvas.drawRect(
 //                left + colorBalls.get(0).getRadiusOfBall(),
 //                top + colorBalls.get(0).getRadiusOfBall(),
@@ -108,12 +120,19 @@ public class SquareView extends View {
         paint.setColor(Color.BLUE);
         paint.setTextSize(18);
         paint.setStrokeWidth(0);
-        for (int i = 0; i < colorBalls.size(); i++) {
-            ColorBall ball = colorBalls.get(i);
-            canvas.drawBitmap(ball.getBitmap(), ball.getX(), ball.getY(),
-                    paint);
+        if (IS_USING_RECT) {
+            canvas.drawBitmap(colorBalls.get(1).getBitmap(), colorBalls.get(1).getX(),
+                    colorBalls.get(1).getY(), paint);
+            canvas.drawBitmap(colorBalls.get(3).getBitmap(), colorBalls.get(3).getX(),
+                    colorBalls.get(3).getY(), paint);
+        } else {
+            for (int i = 0; i < colorBalls.size(); i++) {
+                ColorBall ball = colorBalls.get(i);
+                canvas.drawBitmap(ball.getBitmap(), ball.getX(), ball.getY(),
+                        paint);
 
-            canvas.drawText("" + (i + 1), ball.getX(), ball.getY(), paint);
+                canvas.drawText("" + (i + 1), ball.getX(), ball.getY(), paint);
+            }
         }
     }
 
@@ -199,19 +218,26 @@ public class SquareView extends View {
         balID = 2;
         // declare each ball with the ColorBall class
         for (int i = 0; i < points.length; i++) {
-            colorBalls.add(new ColorBall(getContext(), circleCorners[i], points[i]));
+            colorBalls.add(new ColorBall(getContext(), CIRCLE_CORNERS[i], points[i]));
         }
     }
 
-    public SquareLocation getGridDestination() {
+    public SquareLocation getSquareLocation() {
         int left, right, top, bottom;
-        left = right = colorBalls.get(0).getXCenter();
-        top = bottom = colorBalls.get(0).getYCenter();
-        for (ColorBall colorBall : colorBalls) {
-            left = Math.min(left, colorBall.getXCenter());
-            right = Math.max(right, colorBall.getXCenter());
-            bottom = Math.min(bottom, colorBall.getYCenter());
-            top = Math.max(top, colorBall.getYCenter());
+        if (IS_USING_RECT) {
+            left = colorBalls.get(1).getXCenter();
+            top = colorBalls.get(3).getYCenter();
+            right = colorBalls.get(3).getXCenter();
+            bottom = colorBalls.get(1).getYCenter();
+        } else {
+            left = right = colorBalls.get(0).getXCenter();
+            top = bottom = colorBalls.get(0).getYCenter();
+            for (ColorBall colorBall : colorBalls) {
+                left = Math.min(left, colorBall.getXCenter());
+                right = Math.max(right, colorBall.getXCenter());
+                bottom = Math.max(bottom, colorBall.getYCenter());
+                top = Math.min(top, colorBall.getYCenter());
+            }
         }
         return new SquareLocation(left, right, top, bottom);
     }
@@ -285,7 +311,7 @@ public class SquareView extends View {
         }
 
         public int getHeight() {
-            return top - bottom;
+            return bottom - top;
         }
 
     }
