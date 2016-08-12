@@ -1,11 +1,14 @@
 package com.liron.crypticcrossword;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.text.InputFilter;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
@@ -72,7 +75,16 @@ public class GridLayoutView extends GridLayout {
         editText.setPadding(0, 0, 0, 0);
 //        editText.setMovementMethod(null);
         editText.setGravity(Gravity.CENTER);
-
+//        editText.setFocusableInTouchMode(false);
+        editText.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                view.requestFocus();
+                InputMethodManager imm = (InputMethodManager) activityContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(view, 0);
+                return true;
+            }
+        });
 
         editText.setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override

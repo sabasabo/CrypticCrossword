@@ -23,6 +23,8 @@ public class SquareView extends View {
     public static final int DEFAULT_BALLS_DISTANCE = 200;
     public static final String RECTANGLE_EDGE_COLOR = "#AADB1255";
     public static final String RECTANGLE_AREA_COLOR = "#55DB1255";
+    public static final int[] circleCorners = new int[]{R.drawable.up_left,
+            R.drawable.bottom_left, R.drawable.bottom_right, R.drawable.up_right};
     /**
      * point1 and point 3 are of same group and same as point 2 and point4
      */
@@ -67,6 +69,8 @@ public class SquareView extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.parseColor(RECTANGLE_EDGE_COLOR));
         paint.setStrokeWidth(6);
+
+
         Path path = new Path();
         final ColorBall colorBall1 = colorBalls.get(0);
         final ColorBall colorBall2 = colorBalls.get(1);
@@ -194,8 +198,8 @@ public class SquareView extends View {
 
         balID = 2;
         // declare each ball with the ColorBall class
-        for (Point point : points) {
-            colorBalls.add(new ColorBall(getContext(), R.drawable.circle, point));
+        for (int i = 0; i < points.length; i++) {
+            colorBalls.add(new ColorBall(getContext(), circleCorners[i], points[i]));
         }
     }
 
