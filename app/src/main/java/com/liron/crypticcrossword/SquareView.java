@@ -13,7 +13,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -24,8 +23,11 @@ public class SquareView extends View {
     public static final int DEFAULT_BALLS_DISTANCE = 200;
     public static final String RECTANGLE_EDGE_COLOR = "#AADB1255";
     public static final String RECTANGLE_AREA_COLOR = "#55DB1255";
-    public static final int[] CIRCLE_CORNERS = new int[]{R.drawable.up_left,
-            R.drawable.bottom_left, R.drawable.bottom_right, R.drawable.up_right};
+    public static final int[] CIRCLE_CORNERS = new int[]{R.drawable.circle2,
+            R.drawable.circle2, R.drawable.circle2, R.drawable.circle2};
+
+    //            R.drawable.up_left,
+//            R.drawable.bottom_left, R.drawable.bottom_right, R.drawable.up_right};
     public static final int NAM_OF_COLUMNS = 9;
     private static final int NUM_OF_ROWS = 9;
 
@@ -34,7 +36,7 @@ public class SquareView extends View {
      * point1 and point 3 are of same group and same as point 2 and point4
      */
     // variable to know what ball is being dragged
-    Paint paint;
+    Paint paint = new Paint();
     private Point[] points = new Point[4];
     private ArrayList<ColorBall> colorBalls = new ArrayList<ColorBall>();
     // array that holds the balls
@@ -43,46 +45,34 @@ public class SquareView extends View {
     public SquareView(Context context) {
         super(context);
         setTag(getContext().getString(R.string.squareViewTag));
-        paint = new Paint();
         setFocusable(true); // necessary for getting the touch events
     }
 
-//    public DrawView(Context context, AttributeSet attrs, int defStyle) {
-//        super(context, attrs, defStyle);
-//    }
-//
-//    public DrawView(Context context, AttributeSet attrs) {
-//        super(context, attrs);
-//        paint = new Paint();
-//        setFocusable(true); // necessary for getting the touch events
-//        canvas = new Canvas();
-//    }
-
     @Override
     protected void onDraw(Canvas canvas) {
-        if (points[3] == null) { //point4 null when user did not touch and move on screen.
-            return;
-        }
+//        if (points[3] == null) { //point4 null when user did not touch and move on screen.
+//            return;
+//        }
+        drawSelectionRectangle(canvas);
+        drawCorners(canvas);
+    }
 
-        //draw stroke
+    private void drawSelectionRectangle(Canvas canvas) {
+        ColorBall colorBall1 = colorBalls.get(0);
+        ColorBall colorBall2 = colorBalls.get(1);
+        ColorBall colorBall3 = colorBalls.get(2);
+        ColorBall colorBall4 = colorBalls.get(3);
         paint.setStyle(Paint.Style.STROKE);
-//        paint.setColor(Color.parseColor(RECTANGLE_EDGE_COLOR));
-        paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(10);
-
-
-        final ColorBall colorBall1 = colorBalls.get(0);
-        final ColorBall colorBall2 = colorBalls.get(1);
-        final ColorBall colorBall3 = colorBalls.get(2);
-        final ColorBall colorBall4 = colorBalls.get(3);
         if (IS_USING_RECT) {
             Rect rect = new Rect();
             rect.top = colorBall4.getYCenter();
             rect.bottom = colorBall2.getYCenter();
             rect.left = colorBall2.getXCenter();
             rect.right = colorBall4.getXCenter();
-            canvas.drawRect(rect, paint);
             createPathGrid(rect, canvas);
+            paint.setColor(Color.WHITE);
+            paint.setStrokeWidth(10);
+            canvas.drawRect(rect, paint);
         } else {
             Path path = new Path();
             path.moveTo(colorBall1.getXCenter(), colorBall1.getYCenter());
@@ -92,32 +82,9 @@ public class SquareView extends View {
             path.close();
             canvas.drawPath(path, paint);
         }
-//        canvas.drawRect(
-//                left + colorBalls.get(0).getRadiusOfBall(),
-//                top + colorBalls.get(0).getRadiusOfBall(),
-//                right + colorBalls.get(2).getRadiusOfBall(),
-//                bottom + colorBalls.get(2).getRadiusOfBall(), paint);
+    }
 
-//        canvas.drawLine(colorBall1.getXCenter(), colorBall4.getYCenter(), colorBall2.getXCenter(), colorBall2.getYCenter(), paint);
-//        canvas.drawLine(colorBall2.getXCenter(), colorBall4.getYCenter(), colorBall3.getXCenter(), colorBall3.getYCenter(), paint);
-//        canvas.drawLine(colorBall3.getXCenter(), colorBall4.getYCenter(), colorBall4.getXCenter(), colorBall4.getYCenter(), paint);
-//        canvas.drawLine(colorBall4.getXCenter(), colorBall4.getYCenter(), colorBall1.getXCenter(), colorBall1.getYCenter(), paint);
-        //fill the rectangle
-//        paint.setStyle(Paint.Style.FILL);
-//        paint.setColor(Color.parseColor(RECTANGLE_AREA_COLOR));
-//        paint.setStrokeWidth(0);
-//        canvas.drawRect(
-//                left + colorBalls.get(0).getRadiusOfBall(),
-//                top + colorBalls.get(0).getRadiusOfBall(),
-//                right + colorBalls.get(2).getRadiusOfBall(),
-//                bottom + colorBalls.get(2).getRadiusOfBall(), paint);
-
-        //draw the corners
-        BitmapDrawable bitmap = new BitmapDrawable();
-        // draw the balls on the canvas
-        paint.setColor(Color.BLUE);
-        paint.setTextSize(18);
-        paint.setStrokeWidth(0);
+    private void drawCorners(Canvas canvas) {
         if (IS_USING_RECT) {
             canvas.drawBitmap(colorBalls.get(1).getBitmap(), colorBalls.get(1).getX(),
                     colorBalls.get(1).getY(), paint);
@@ -128,7 +95,9 @@ public class SquareView extends View {
                 ColorBall ball = colorBalls.get(i);
                 canvas.drawBitmap(ball.getBitmap(), ball.getX(), ball.getY(),
                         paint);
-
+                paint.setColor(Color.BLUE);
+                paint.setTextSize(18);
+                paint.setStrokeWidth(0);
                 canvas.drawText("" + (i + 1), ball.getX(), ball.getY(), paint);
             }
         }
@@ -136,13 +105,14 @@ public class SquareView extends View {
 
     private void createPathGrid(Rect rect, Canvas canvas) {
         //draw stroke
-        paint.setStrokeWidth(4);
+        paint.setColor(Color.GRAY);
+        paint.setStrokeWidth(5);
         int widthStep = rect.width() / NAM_OF_COLUMNS;
         int heightStep = rect.height() / NUM_OF_ROWS;
         for (int i = rect.left + widthStep; i < rect.right && widthStep > 0; i += widthStep) {
             canvas.drawLine(i, rect.bottom, i, rect.top, paint);
         }
-        for (int j = rect.top; j < rect.bottom && heightStep > 0; j += heightStep) {
+        for (int j = rect.top + heightStep; j < rect.bottom && heightStep > 0; j += heightStep) {
             canvas.drawLine(rect.left, j, rect.right, j, paint);
         }
     }
@@ -158,15 +128,11 @@ public class SquareView extends View {
                 for (int i = colorBalls.size() - 1; i >= 0; i--) {
                     ColorBall ball = colorBalls.get(i);
 
-                    paint.setColor(Color.CYAN);
                     if (userTouchedTheBall(touchX, touchY, ball)) {
                         balID = ball.getID();
-                        invalidate();
-                        break;
                     }
                     invalidate();
                 }
-//                }
                 break;
             case MotionEvent.ACTION_MOVE: // touch drag with the ball
                 if (balID > -1) {
@@ -174,9 +140,6 @@ public class SquareView extends View {
                     final ColorBall colorBall = colorBalls.get(balID);
                     colorBall.setX(touchX - colorBall.getRadiusOfBall());
                     colorBall.setY(touchY - colorBall.getRadiusOfBall());
-
-//                    paint.setColor(Color.CYAN);
-//                    moveBallsToPreserveRectangle();
                     invalidate();
                 }
                 break;
@@ -194,20 +157,6 @@ public class SquareView extends View {
         int centerY = ball.getY() + ball.getRadiusOfBall();
         return Math.abs(centerX - touchX) < ball.getRadiusOfBall() && Math.abs(centerY - touchY) < ball.getRadiusOfBall();
     }
-
-//    private void moveBallsToPreserveRectangle() {
-//        if (groupId == 1) {
-//            colorBalls.get(1).setX(colorBalls.get(0).getX());
-//            colorBalls.get(1).setY(colorBalls.get(2).getY());
-//            colorBalls.get(3).setX(colorBalls.get(2).getX());
-//            colorBalls.get(3).setY(colorBalls.get(0).getY());
-//        } else {
-//            colorBalls.get(0).setX(colorBalls.get(1).getX());
-//            colorBalls.get(0).setY(colorBalls.get(3).getY());
-//            colorBalls.get(2).setX(colorBalls.get(3).getX());
-//            colorBalls.get(2).setY(colorBalls.get(1).getY());
-//        }
-//    }
 
     public void initBalls(int touchX, int touchY) {
         points[0] = new Point();
@@ -324,6 +273,5 @@ public class SquareView extends View {
         public int getHeight() {
             return bottom - top;
         }
-
     }
 }
