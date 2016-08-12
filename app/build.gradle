@@ -27,4 +27,5 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
+    compile 'me.grantland:autofittextview:0.2.1'
 }

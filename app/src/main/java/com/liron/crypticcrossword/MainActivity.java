@@ -8,9 +8,6 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int MAX_RGB = 100;
-    public static final int AVERAGE_RGB = 65;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

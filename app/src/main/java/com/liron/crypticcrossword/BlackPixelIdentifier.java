@@ -7,34 +7,46 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 public class BlackPixelIdentifier {
-    public static final int MAX_RGB = 170;
-    public static final int AVERAGE_RGB = 110;
+    public static final int MAX_RGB = 150;
+    public static final int AVERAGE_RGB = 90;
     private static final int IMAGE_LAYOUT_ID = R.id.layout;
-    private final GridLayoutView gridLayoutView;
     private final Activity context;
 
-    public BlackPixelIdentifier(GridLayoutView gridLayoutView, Activity context) {
-        this.gridLayoutView = gridLayoutView;
+    public BlackPixelIdentifier(Activity context) {
         this.context = context;
     }
 
-    public boolean isBlack(View view) {
-        int touchColor = getHotspotColor(getXSample(view), getYSample(view));
+    public boolean isBlack(View view, View root) {
+        int touchColor = getHotspotColor(getXSample(view, root), getYSample(view, root));
         return getAverageRGB(touchColor) < AVERAGE_RGB && getMaxRGB(touchColor) < MAX_RGB;
     }
 
-    private int getYSample(View view) {
+    private int getRelativeLeft(View myView, View root) {
+        if (myView.getParent() == root) //myView.getRootView())
+            return myView.getLeft();
+        else
+            return myView.getLeft() + getRelativeLeft((View) myView.getParent(), root);
+    }
+
+    private int getRelativeTop(View myView, View root) {
+        if (myView.getParent() == root) //myView.getRootView())
+            return myView.getTop();
+        else
+            return myView.getTop() + getRelativeTop((View) myView.getParent(), root);
+    }
+
+    private int getYSample(View view, View root) {
         //int[] location = new int[2];
         //view.getLocationOnScreen(location);
         //return location[1] + view.getHeight() / 2;
-        return (int) view.getY() + 20;
+        return (int) (getRelativeTop(view, root) + view.getPivotY());
     }
 
-    private int getXSample(View view) {
+    private int getXSample(View view, View root) {
         //       int[] location = new int[2];
         //       view.getLocationOnScreen(location);
         //       return location[0] + view.getWidth() / 2;
-        return (int) view.getX() + 20;
+        return (int) (getRelativeLeft(view, root) + view.getPivotX());
     }
 
     public int getMaxRGB(int touchColor) {
