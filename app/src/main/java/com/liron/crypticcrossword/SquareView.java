@@ -26,6 +26,8 @@ public class SquareView extends View {
     public static final String RECTANGLE_AREA_COLOR = "#55DB1255";
     public static final int[] CIRCLE_CORNERS = new int[]{R.drawable.up_left,
             R.drawable.bottom_left, R.drawable.bottom_right, R.drawable.up_right};
+    public static final int NAM_OF_COLUMNS = 9;
+    private static final int NUM_OF_ROWS = 9;
 
     private final boolean IS_USING_RECT = true;
     /**
@@ -33,7 +35,6 @@ public class SquareView extends View {
      */
     // variable to know what ball is being dragged
     Paint paint;
-    Canvas canvas;
     private Point[] points = new Point[4];
     private ArrayList<ColorBall> colorBalls = new ArrayList<ColorBall>();
     // array that holds the balls
@@ -44,7 +45,6 @@ public class SquareView extends View {
         setTag(getContext().getString(R.string.squareViewTag));
         paint = new Paint();
         setFocusable(true); // necessary for getting the touch events
-        canvas = new Canvas();
     }
 
 //    public DrawView(Context context, AttributeSet attrs, int defStyle) {
@@ -63,15 +63,12 @@ public class SquareView extends View {
         if (points[3] == null) { //point4 null when user did not touch and move on screen.
             return;
         }
-        paint.setAntiAlias(true);
-        paint.setDither(true);
-        paint.setStrokeJoin(Paint.Join.ROUND);
-        paint.setStrokeWidth(15);
 
         //draw stroke
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.parseColor(RECTANGLE_EDGE_COLOR));
-        paint.setStrokeWidth(6);
+//        paint.setColor(Color.parseColor(RECTANGLE_EDGE_COLOR));
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(10);
 
 
         final ColorBall colorBall1 = colorBalls.get(0);
@@ -85,6 +82,7 @@ public class SquareView extends View {
             rect.left = colorBall2.getXCenter();
             rect.right = colorBall4.getXCenter();
             canvas.drawRect(rect, paint);
+            createPathGrid(rect, canvas);
         } else {
             Path path = new Path();
             path.moveTo(colorBall1.getXCenter(), colorBall1.getYCenter());
@@ -136,6 +134,19 @@ public class SquareView extends View {
         }
     }
 
+    private void createPathGrid(Rect rect, Canvas canvas) {
+        //draw stroke
+        paint.setStrokeWidth(4);
+        int widthStep = rect.width() / NAM_OF_COLUMNS;
+        int heightStep = rect.height() / NUM_OF_ROWS;
+        for (int i = rect.left + widthStep; i < rect.right && widthStep > 0; i += widthStep) {
+            canvas.drawLine(i, rect.bottom, i, rect.top, paint);
+        }
+        for (int j = rect.top; j < rect.bottom && heightStep > 0; j += heightStep) {
+            canvas.drawLine(rect.left, j, rect.right, j, paint);
+        }
+    }
+
     // events when touching the screen
     public boolean onTouchEvent(MotionEvent event) {
         int eventAction = event.getAction();
@@ -164,7 +175,7 @@ public class SquareView extends View {
                     colorBall.setX(touchX - colorBall.getRadiusOfBall());
                     colorBall.setY(touchY - colorBall.getRadiusOfBall());
 
-                    paint.setColor(Color.CYAN);
+//                    paint.setColor(Color.CYAN);
 //                    moveBallsToPreserveRectangle();
                     invalidate();
                 }
