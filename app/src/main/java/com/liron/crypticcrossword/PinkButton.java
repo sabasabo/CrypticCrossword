@@ -1,6 +1,7 @@
 package com.liron.crypticcrossword;
 
 import android.app.Activity;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -70,6 +71,7 @@ public class PinkButton {
             GridLayoutView gridView = new GridLayoutView(activity, squareView.getNumOfRows(), squareView.getNumOfColumns(),
                     squareView.getSquareLocation());
             ((FrameLayout) activity.findViewById(R.id.layout)).removeView(squareView);
+            ((CoordinatorLayout) activity.findViewById(R.id.superParent)).removeView(floatingButton);
         }
 
         @Override
