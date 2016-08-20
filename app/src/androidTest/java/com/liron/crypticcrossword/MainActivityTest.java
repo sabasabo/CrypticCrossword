@@ -30,7 +30,8 @@ import java.util.List;
 @LargeTest
 public class MainActivityTest {
 
-    private static final int NUM_OF_CELLS = 81;
+    private static final int NUM_OF_ROWS = 9;
+    private static final int NUM_OF_COLUMNS = 9;
     private static final List<Integer> blackCellsLTR = new ArrayList<>(Arrays.asList(0, 9, 10, 12, 14, 16, 23, 28, 30, 32, 34, 35, 40, 46, 48, 50, 51, 52, 57, 64, 66, 68, 70, 72, 73));
     private static final List<Integer> blackCellsRTL = new ArrayList<>(Arrays.asList(8, 10, 12, 14, 16, 17, 21, 78, 28, 30, 32, 34, 40, 46, 47, 48, 50, 52, 59, 64, 66, 68, 70, 79, 80));
     @Rule
@@ -58,7 +59,7 @@ public class MainActivityTest {
         mActivityRule.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                gridView[0] = new GridLayoutView(mActivityRule.getActivity(), NUM_OF_CELLS, location);
+                gridView[0] = new GridLayoutView(mActivityRule.getActivity(), NUM_OF_ROWS, NUM_OF_COLUMNS, location);
             }
         });
         Thread.sleep(1000);

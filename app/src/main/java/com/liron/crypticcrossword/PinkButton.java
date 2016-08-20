@@ -13,7 +13,6 @@ import java.util.List;
  * Created by lir on 21/05/2016.
  */
 public class PinkButton {
-    private static final int NUM_OF_CELLS = 81;
     private List<ButtonAction> buttonActions;
     private FloatingActionButton floatingButton;
     private Activity activity;
@@ -68,7 +67,8 @@ public class PinkButton {
         @Override
         public void doAction() {
 
-            GridLayoutView gridView = new GridLayoutView(activity, NUM_OF_CELLS, squareView.getSquareLocation());
+            GridLayoutView gridView = new GridLayoutView(activity, squareView.getNumOfRows(), squareView.getNumOfColumns(),
+                    squareView.getSquareLocation());
             ((FrameLayout) activity.findViewById(R.id.layout)).removeView(squareView);
         }
 

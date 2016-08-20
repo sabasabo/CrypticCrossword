@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SquareView extends View {
 
@@ -28,8 +29,6 @@ public class SquareView extends View {
 
     //            R.drawable.up_left,
 //            R.drawable.bottom_left, R.drawable.bottom_right, R.drawable.up_right};
-    public static final int NAM_OF_COLUMNS = 9;
-    private static final int NUM_OF_ROWS = 9;
 
     private final boolean IS_USING_RECT = true;
     /**
@@ -38,7 +37,8 @@ public class SquareView extends View {
     // variable to know what ball is being dragged
     Paint paint = new Paint();
     private Point[] points = new Point[4];
-    private ArrayList<ColorBall> colorBalls = new ArrayList<ColorBall>();
+    private LinesButtons lineButtons = new LinesButtons(getContext());
+    private List<ColorBall> colorBalls = new ArrayList<ColorBall>();
     // array that holds the balls
     private int balID = 0;
 
@@ -54,6 +54,7 @@ public class SquareView extends View {
 //            return;
 //        }
         drawSelectionRectangle(canvas);
+        lineButtons.draw(canvas, colorBalls.get(1).point, colorBalls.get(3).point, paint);
         drawCorners(canvas);
     }
 
@@ -107,14 +108,22 @@ public class SquareView extends View {
         //draw stroke
         paint.setColor(Color.GRAY);
         paint.setStrokeWidth(5);
-        int widthStep = rect.width() / NAM_OF_COLUMNS;
-        int heightStep = rect.height() / NUM_OF_ROWS;
+        int widthStep = rect.width() / getNumOfColumns();
+        int heightStep = rect.height() / getNumOfRows();
         for (int i = rect.left + widthStep; i < rect.right && widthStep > 0; i += widthStep) {
             canvas.drawLine(i, rect.bottom, i, rect.top, paint);
         }
         for (int j = rect.top + heightStep; j < rect.bottom && heightStep > 0; j += heightStep) {
             canvas.drawLine(rect.left, j, rect.right, j, paint);
         }
+    }
+
+    public int getNumOfRows() {
+        return lineButtons.getNumOfRows();
+    }
+
+    public int getNumOfColumns() {
+        return lineButtons.getNumOfColumns();
     }
 
     // events when touching the screen
@@ -131,12 +140,16 @@ public class SquareView extends View {
                     if (userTouchedTheBall(touchX, touchY, ball)) {
                         balID = ball.getID();
                     }
-                    invalidate();
                 }
+                if (balID == -1) {
+                    lineButtons.handleButtonsTouch(touchX, touchY);
+                }
+                invalidate();
                 break;
             case MotionEvent.ACTION_MOVE: // touch drag with the ball
                 if (balID > -1) {
                     // move the balls the same as the finger
+                    lineButtons.setVisibility(false);
                     final ColorBall colorBall = colorBalls.get(balID);
                     colorBall.setX(touchX - colorBall.getRadiusOfBall());
                     colorBall.setY(touchY - colorBall.getRadiusOfBall());
@@ -144,7 +157,7 @@ public class SquareView extends View {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                // touch drop - just do things here after dropping
+                lineButtons.setVisibility(true);
                 break;
         }
         invalidate();
@@ -153,9 +166,13 @@ public class SquareView extends View {
     }
 
     private boolean userTouchedTheBall(int touchX, int touchY, ColorBall ball) {
-        int centerX = ball.getX() + ball.getRadiusOfBall();
-        int centerY = ball.getY() + ball.getRadiusOfBall();
-        return Math.abs(centerX - touchX) < ball.getRadiusOfBall() && Math.abs(centerY - touchY) < ball.getRadiusOfBall();
+        return isInRange(touchX, touchY, ball.point, ball.getRadiusOfBall());
+    }
+
+    private boolean isInRange(int touchX, int touchY, Point circle, int radius) {
+        int centerX = circle.x + radius;
+        int centerY = circle.y + radius;
+        return Math.abs(centerX - touchX) < radius && Math.abs(centerY - touchY) < radius;
     }
 
     public void initBalls(int touchX, int touchY) {

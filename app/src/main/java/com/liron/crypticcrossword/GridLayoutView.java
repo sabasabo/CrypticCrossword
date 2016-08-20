@@ -22,19 +22,22 @@ public class GridLayoutView extends GridLayout {
     private final Activity activityContext;
     private final int editTextWidth;
     private final int editTextHeight;
+    private final int numOfRows;
+    private final int numOfColumns;
     private BlackPixelIdentifier blackPixelIdentifier;
 //    private final TextView textResizerView;
 
-    public GridLayoutView(final Activity context, int numOfCells, SquareView.SquareLocation location) {
+    public GridLayoutView(final Activity context, int numOfRows, int numOfColumns, SquareView.SquareLocation location) {
         super(context);
         activityContext = context;
         blackPixelIdentifier = new BlackPixelIdentifier(context);
         parentLayout = (FrameLayout) context.findViewById(R.id.layout);
-        int numOfColumns = (int) Math.sqrt(numOfCells);
+        this.numOfRows = numOfRows;
+        this.numOfColumns = numOfColumns;
         editTextWidth = Math.round(location.getWidth() / numOfColumns) - 2 * MARGIN;
-        editTextHeight = Math.round(location.getHeight() / numOfColumns) - 2 * MARGIN;
-        for (int i = 0; i < numOfCells; i++) {
-            createEditBox(numOfColumns, i);
+        editTextHeight = Math.round(location.getHeight() / numOfRows) - 2 * MARGIN;
+        for (int i = 0; i < numOfRows * numOfColumns; i++) {
+            createEditBox(i);
         }
         final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParams.rightMargin = parentLayout.getRight() - location.right;
@@ -64,10 +67,10 @@ public class GridLayoutView extends GridLayout {
 
     }
 
-    private void createEditBox(int numOfColumns, int i) {
+    private void createEditBox(int i) {
         final EditText editText = new EditText(activityContext);
         editText.setId(this.getId() + i + 1);
-        LayoutParams params = createParams(numOfColumns, i);
+        LayoutParams params = createParams(i);
         editText.setBackgroundColor(Color.TRANSPARENT);
 //        editText.setBackgroundColor(Color.WHITE);
         editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(1)});
@@ -96,7 +99,6 @@ public class GridLayoutView extends GridLayout {
                         view.setClickable(false);
                     } else {
                         EditText editText = (EditText) view;
-//                        editText.setOnFocusChangeListener(null);
                         editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, editText.getHeight());
 //                        TextKeyListener.clear(editText.getText());
 //                        textResizerView.setText(editText.getText());
@@ -134,7 +136,7 @@ public class GridLayoutView extends GridLayout {
         this.addView(editText, params);
     }
 
-    private LayoutParams createParams(int numOfColumns, int i) {
+    private LayoutParams createParams(int i) {
         Spec row = GridLayout.spec(i / numOfColumns, 1, 1f);
         Spec col = GridLayout.spec(i % numOfColumns, 1, 1f);
         LayoutParams params = new LayoutParams(row, col);
