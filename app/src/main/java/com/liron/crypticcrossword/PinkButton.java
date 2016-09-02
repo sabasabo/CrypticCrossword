@@ -53,8 +53,8 @@ public class PinkButton {
         @Override
         public void doAction() {
             ((FrameLayout) activity.findViewById(R.id.layout)).addView(squareView);
-            final View img = activity.findViewById(R.id.layout);
-            squareView.initBalls((int) img.getX() + img.getWidth() / 2, (int) img.getY() + img.getHeight() / 2);
+            View board = activity.findViewById(R.id.layout);
+            squareView.initBalls();
         }
 
         @Override
@@ -68,7 +68,8 @@ public class PinkButton {
         @Override
         public void doAction() {
 
-            GridLayoutView gridView = new GridLayoutView(activity, squareView.getNumOfRows(), squareView.getNumOfColumns(),
+            GridLayoutView gridLayoutView = (GridLayoutView) activity.findViewById(R.id.grid_board);
+            gridLayoutView.setGridValues(squareView.getNumOfRows(), squareView.getNumOfColumns(),
                     squareView.getSquareLocation());
             ((FrameLayout) activity.findViewById(R.id.layout)).removeView(squareView);
             ((CoordinatorLayout) activity.findViewById(R.id.superParent)).removeView(floatingButton);

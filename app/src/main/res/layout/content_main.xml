@@ -7,4 +7,10 @@
     android:layout_height="match_parent"
     tools:context="com.liron.crypticcrossword.MainActivity"
     tools:showIn="@layout/activity_main">
+
+    <com.liron.crypticcrossword.GridLayoutView
+        android:id="@+id/grid_board"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </com.liron.crypticcrossword.GridLayoutView>
 </FrameLayout>

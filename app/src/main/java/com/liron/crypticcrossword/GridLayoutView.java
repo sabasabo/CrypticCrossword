@@ -4,47 +4,53 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.InputFilter;
+import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
+import android.widget.TextView;
 
 /**
  * Created by lir on 11/06/2016.
  */
 public class GridLayoutView extends GridLayout {
     public static final int MARGIN = 10;
-    private final FrameLayout parentLayout;
-    private final Activity activityContext;
-    private final int editTextWidth;
-    private final int editTextHeight;
-    private final int numOfRows;
-    private final int numOfColumns;
+    public TextView currentModifiedCell = null;
+    public TextView firstColoredCell = null;
+    private FrameLayout parentLayout;
+    private int editTextWidth;
+    private int editTextHeight;
     private BlackPixelIdentifier blackPixelIdentifier;
-//    private final TextView textResizerView;
+    private boolean directionHorizontal = true;
+
+    public GridLayoutView(Context context) {
+        super(context);
+    }
+
+    public GridLayoutView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
 
     public GridLayoutView(final Activity context, int numOfRows, int numOfColumns, SquareView.SquareLocation location) {
         super(context);
-        activityContext = context;
         blackPixelIdentifier = new BlackPixelIdentifier(context);
         parentLayout = (FrameLayout) context.findViewById(R.id.layout);
-        this.numOfRows = numOfRows;
-        this.numOfColumns = numOfColumns;
-        editTextWidth = Math.round(location.getWidth() / numOfColumns) - 2 * MARGIN;
+        setRowCount(numOfRows);
+        setColumnCount(numOfColumns);
+        editTextWidth = Math.round(location.getWidth() / getColumnCount()) - 2 * MARGIN;
         editTextHeight = Math.round(location.getHeight() / numOfRows) - 2 * MARGIN;
-        for (int i = 0; i < numOfRows * numOfColumns; i++) {
-            createEditBox(i);
+        for (int i = 0; i < numOfRows * getColumnCount(); i++) {
+            createTextBox(i);
         }
         final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParams.rightMargin = parentLayout.getRight() - location.right;
         layoutParams.topMargin = location.top; // - parentLayout.getTop();
         final GridLayoutView[] gridLayoutViews = new GridLayoutView[1];
         gridLayoutViews[0] = this;
-//        this.setBackgroundColor(R.color.colorAccent);
         context.runOnUiThread((new Runnable() {
             @Override
             public void run() {
@@ -52,93 +58,117 @@ public class GridLayoutView extends GridLayout {
 
             }
         }));
-
-//        textResizerView = new TextView(activityContext);
-//        textResizerView.setBackgroundColor(Color.BLUE);
-//        AutofitHelper autofitHelper = AutofitHelper.create(textResizerView);
-//        autofitHelper.setEnabled(true);
-//        autofitHelper.setMinTextSize(TypedValue.COMPLEX_UNIT_SP, 3);
-//        LayoutParams params = new LayoutParams();
-//        params.height = Math.round(location.getHeight() / numOfColumns) - 2 * MARGIN;
-//        params.width = Math.min(params.height, Math.round(location.getWidth() / numOfColumns) - 2 * MARGIN) / 2;
-//        textResizerView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-//        parentLayout.addView(textResizerView, params);
-
-
     }
 
-    private void createEditBox(int i) {
-        final EditText editText = new EditText(activityContext);
-        editText.setId(this.getId() + i + 1);
+    public boolean getIsDirectionHorizontal() {
+        return directionHorizontal;
+    }
+
+    public void setIsDirectionHorizontal(boolean directionHorizontal) {
+        this.directionHorizontal = directionHorizontal;
+    }
+
+    public void setGridValues(int numOfRows, int numOfColumns, SquareView.SquareLocation location) {
+//        blackPixelIdentifier = new BlackPixelIdentifier(context);
+        parentLayout = (FrameLayout) getParent();
+        setRowCount(numOfRows);
+        setColumnCount(numOfColumns);
+        editTextWidth = Math.round(location.getWidth() / getColumnCount()) - 2 * MARGIN;
+        editTextHeight = Math.round(location.getHeight() / numOfRows) - 2 * MARGIN;
+        for (int i = 0; i < numOfRows * getColumnCount(); i++) {
+            createTextBox(i);
+        }
+        final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        layoutParams.rightMargin = parentLayout.getRight() - location.right;
+        layoutParams.topMargin = location.top; // - parentLayout.getTop();
+        setLayoutParams(layoutParams);
+    }
+
+
+    private void createTextBox(int i) {
+        final TextView textView = new TextView(getContext());
+        textView.setId(this.getId() + i + 1);
+        textView.setTag(i);
         LayoutParams params = createParams(i);
-        editText.setBackgroundColor(Color.TRANSPARENT);
-//        editText.setBackgroundColor(Color.WHITE);
-        editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(1)});
-//        editText.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
-        editText.setPadding(0, 0, 0, 0);
-//        editText.setMovementMethod(null);
-        editText.setGravity(Gravity.CENTER);
-//        editText.setFocusableInTouchMode(false);
-        editText.setOnTouchListener(new OnTouchListener() {
+        textView.setBackgroundColor(Color.TRANSPARENT);
+        textView.setFilters(new InputFilter[]{new InputFilter.LengthFilter(1)});
+        textView.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
-                view.requestFocus();
-                InputMethodManager imm = (InputMethodManager) activityContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                removeColorFromAllCells();
+                colorNextCells((TextView) view);
+                currentModifiedCell = (TextView) view;
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(view, 0);
                 return true;
             }
         });
 
-        editText.setOnFocusChangeListener(new OnFocusChangeListener() {
+        textView.setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
-                    if (blackPixelIdentifier.isBlack(view, parentLayout)) {
-                        view.setVisibility(View.INVISIBLE);
-                        view.setFocusable(false);
-                        view.setClickable(false);
-                    } else {
-                        EditText editText = (EditText) view;
-                        editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, editText.getHeight());
-//                        TextKeyListener.clear(editText.getText());
-//                        textResizerView.setText(editText.getText());
-//                        editText.setTextSize(textResizerView.getTextSize());
-                    }
+//                    if (blackPixelIdentifier.isBlack(view, parentLayout)) {
+//                        view.setVisibility(View.INVISIBLE);
+//                        view.setFocusable(false);
+//                        view.setClickable(false);
+//                    } else {
+                    TextView textView = (TextView) view;
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textView.getHeight());
+//                        TextKeyListener.clear(textView.getText());
+//                        textResizerView.setText(textView.getText());
+//                        textView.setTextSize(textResizerView.getTextSize());
+//                    }
                 }
             }
         });
-//                editText.addTextChangedListener(new TextWatcher() {
-//                    @Override
-//                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-//
-//                    }
-//
-//                    @Override
-//                    public void afterTextChanged(Editable s) {
-//                        textResizerView.setText(editText.getText());
-//                        editText.setTextSize(textResizerView.getTextSize());
-//                        editText.setTextAlignment(textResizerView.getTextAlignment());
-//                    }
-//                });
-//        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
-//                textResizerView.setText(view.getText());
-//                view.setTextSize(textResizerView.getTextSize());
-//                return false;
-//            }
-//        });
-        this.addView(editText, params);
+        this.addView(textView, params);
+    }
+
+    public void removeColorFromAllCells() {
+        for (int i = 0; i < getChildCount(); i++) {
+            getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
+        }
+    }
+
+    public void colorNextCells(TextView cell) {
+        firstColoredCell = cell;
+        Integer index = (Integer) cell.getTag();
+        if (directionHorizontal) {
+            int lastCell = (index / getColumnCount() + 1) * getColumnCount();
+            for (int i = index; i < lastCell; i++) {
+                colorCellAndFixFont((TextView) getChildAt(i));
+            }
+        } else {
+            for (int i = index; i < getChildCount(); i += getColumnCount()) {
+                colorCellAndFixFont((TextView) getChildAt(i));
+            }
+        }
+    }
+
+    private void colorCellAndFixFont(TextView nextCell) {
+        nextCell.setBackgroundResource(R.drawable.select_next_cells_transperent);
+        nextCell.setTextSize(TypedValue.COMPLEX_UNIT_PX, (float) (0.9 * nextCell.getHeight()));
+        nextCell.setPadding(0, 0, 0, 0);
+        nextCell.setGravity(Gravity.CENTER);
+    }
+
+    public void setNextCellAsCurrent() {
+        Integer index = (Integer) currentModifiedCell.getTag();
+        if (directionHorizontal) {
+            if (index % getColumnCount() < getColumnCount() - 1) {
+                currentModifiedCell = (TextView) getChildAt(index + 1);
+            }
+        } else {
+            if (index + getColumnCount() < getChildCount()) {
+                currentModifiedCell = (TextView) getChildAt(index + getColumnCount());
+            }
+        }
     }
 
     private LayoutParams createParams(int i) {
-        Spec row = GridLayout.spec(i / numOfColumns, 1, 1f);
-        Spec col = GridLayout.spec(i % numOfColumns, 1, 1f);
+        Spec row = GridLayout.spec(i / getColumnCount(), 1, 1f);
+        Spec col = GridLayout.spec(i % getColumnCount(), 1, 1f);
         LayoutParams params = new LayoutParams(row, col);
         params.width = editTextWidth;
         params.height = editTextHeight;

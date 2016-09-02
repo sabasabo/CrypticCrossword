@@ -13,8 +13,10 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +29,7 @@ public class SquareView extends View {
     public static final int[] CIRCLE_CORNERS = new int[]{R.drawable.circle2,
             R.drawable.circle2, R.drawable.circle2, R.drawable.circle2};
 
-    //            R.drawable.up_left,
-//            R.drawable.bottom_left, R.drawable.bottom_right, R.drawable.up_right};
-
     private final boolean IS_USING_RECT = true;
-    /**
-     * point1 and point 3 are of same group and same as point 2 and point4
-     */
-    // variable to know what ball is being dragged
     Paint paint = new Paint();
     private Point[] points = new Point[4];
     private LinesButtons lineButtons = new LinesButtons(getContext());
@@ -166,7 +161,8 @@ public class SquareView extends View {
     }
 
     private boolean userTouchedTheBall(int touchX, int touchY, ColorBall ball) {
-        return isInRange(touchX, touchY, ball.point, ball.getRadiusOfBall());
+        return Math.sqrt(Math.pow(touchX - ball.getXCenter(), 2) +
+                Math.pow(touchY - ball.getYCenter(), 2)) < ball.getRadiusOfBall();
     }
 
     private boolean isInRange(int touchX, int touchY, Point circle, int radius) {
@@ -175,27 +171,35 @@ public class SquareView extends View {
         return Math.abs(centerX - touchX) < radius && Math.abs(centerY - touchY) < radius;
     }
 
-    public void initBalls(int touchX, int touchY) {
+    public void initBalls() {
+        WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int x = size.x / 2;
+        int y = size.y / 3;
+        int distanceX = (int) (size.x * 0.5);
+        int distanceY = (int) (size.y * 0.3);
         points[0] = new Point();
-        points[0].x = touchX - DEFAULT_BALLS_DISTANCE / 2;
-        points[0].y = touchY - DEFAULT_BALLS_DISTANCE / 2;
+        points[0].x = x - distanceX / 2;
+        points[0].y = y - distanceY / 2;
 
         points[1] = new Point();
-        points[1].x = touchX - DEFAULT_BALLS_DISTANCE / 2;
-        points[1].y = touchY + DEFAULT_BALLS_DISTANCE / 2;
+        points[1].x = x - distanceX / 2;
+        points[1].y = y + distanceY / 2;
 
         points[2] = new Point();
-        points[2].x = touchX + DEFAULT_BALLS_DISTANCE / 2;
-        points[2].y = touchY + DEFAULT_BALLS_DISTANCE / 2;
+        points[2].x = x + distanceX / 2;
+        points[2].y = y + distanceY / 2;
 
         points[3] = new Point();
-        points[3].x = touchX + DEFAULT_BALLS_DISTANCE / 2;
-        points[3].y = touchY - DEFAULT_BALLS_DISTANCE / 2;
+        points[3].x = x + distanceX / 2;
+        points[3].y = y - distanceY / 2;
 
         balID = 2;
         // declare each ball with the ColorBall class
         for (int i = 0; i < points.length; i++) {
-            colorBalls.add(new ColorBall(getContext(), CIRCLE_CORNERS[i], points[i]));
+            colorBalls.add(new ColorBall(getContext(), CIRCLE_CORNERS[i], points[i], i));
         }
     }
 
@@ -221,13 +225,12 @@ public class SquareView extends View {
 
     public static class ColorBall {
 
-        private static int count = 0;
         private Bitmap bitmap;
         private Point point;
         private int id;
 
-        public ColorBall(Context context, int resourceId, Point point) {
-            id = count++;
+        public ColorBall(Context context, int resourceId, Point point, int id) {
+            this.id = id;
             bitmap = BitmapFactory.decodeResource(context.getResources(),
                     resourceId);
             this.point = point;
