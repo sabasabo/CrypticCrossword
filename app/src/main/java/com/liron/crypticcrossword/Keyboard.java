@@ -14,13 +14,15 @@ import java.util.List;
  */
 public class Keyboard {
     public static final String DELIMITER = ",";
-    private static final List<String> SPECIAL_KEYWORDS = Arrays.asList("direction");
+    private static final List<String> SPECIAL_KEYWORDS = Arrays.asList("direction", "keyboard");
     private static GridLayout keyboardGrid;
     private static Activity context;
+    private static String currentKeyboardName;
 
     static void createKeyboard(Activity activity, int keyboardId) {
         keyboardGrid = (GridLayout) activity.findViewById(R.id.keyboard);
         context = activity;
+        currentKeyboardName = context.getResources().getResourceEntryName(keyboardId);
         String[] keyboardLines = activity.getResources().getStringArray(keyboardId);
         setGridDimensions(keyboardLines);
         int rowIndex = 0;
@@ -50,6 +52,7 @@ public class Keyboard {
         final TextView key = new TextView(context);
         key.setLayoutParams(param);
         key.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        key.setGravity(Gravity.CENTER);
         if (isSpecialKey(letter)) {
             setSpecialStyleAndFunction(key, letter);
         } else {
@@ -94,6 +97,18 @@ public class Keyboard {
                     boardGrid.setIsDirectionHorizontal(!boardGrid.getIsDirectionHorizontal());
                     boardGrid.currentModifiedCell = boardGrid.firstColoredCell;
                     boardGrid.colorNextCells(boardGrid.firstColoredCell);
+                }
+            });
+        } else if (specialWord.equals("keyboard")) {
+            key.setBackgroundResource(R.drawable.keyboard_icon);
+            key.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View key) {
+                    keyboardGrid.removeAllViews();
+                    List<String> keyboards = Arrays.asList(context.getResources().getString(R.string.keyboards).split(","));
+                    int index = (keyboards.indexOf(currentKeyboardName) + 1) % keyboards.size();
+                    int id = context.getResources().getIdentifier(keyboards.get(index), "array", context.getPackageName());
+                    createKeyboard(context, id);
                 }
             });
         }

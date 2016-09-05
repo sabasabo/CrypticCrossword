@@ -63,6 +63,15 @@ public class LinesButtons {
         }
     }
 
+    public boolean isInButtonsRange(int touchX, int touchY) {
+        for (LinesButton linesButton : buttons) {
+            if (linesButton.isInRange(touchX, touchY)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int getNumOfColumns() {
         return numOfColumns;
     }

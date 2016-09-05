@@ -36,7 +36,9 @@ public class SquareView extends View {
     private List<ColorBall> colorBalls = new ArrayList<ColorBall>();
     // array that holds the balls
     private int balID = 0;
-
+    private Rect gridRect = new Rect();
+    private Point deltaRectMovePoint = null;
+    private EItemMoved currentItemMoved = EItemMoved.NONE;
     public SquareView(Context context) {
         super(context);
         setTag(getContext().getString(R.string.squareViewTag));
@@ -60,15 +62,16 @@ public class SquareView extends View {
         ColorBall colorBall4 = colorBalls.get(3);
         paint.setStyle(Paint.Style.STROKE);
         if (IS_USING_RECT) {
-            Rect rect = new Rect();
-            rect.top = colorBall4.getYCenter();
-            rect.bottom = colorBall2.getYCenter();
-            rect.left = colorBall2.getXCenter();
-            rect.right = colorBall4.getXCenter();
-            createPathGrid(rect, canvas);
+            if (currentItemMoved != EItemMoved.GRID_RECT) {
+                gridRect.top = colorBall4.getYCenter();
+                gridRect.bottom = colorBall2.getYCenter();
+                gridRect.left = colorBall2.getXCenter();
+                gridRect.right = colorBall4.getXCenter();
+            }
+            createPathGrid(gridRect, canvas);
             paint.setColor(Color.WHITE);
             paint.setStrokeWidth(10);
-            canvas.drawRect(rect, paint);
+            canvas.drawRect(gridRect, paint);
         } else {
             Path path = new Path();
             path.moveTo(colorBall1.getXCenter(), colorBall1.getYCenter());
@@ -129,27 +132,36 @@ public class SquareView extends View {
         switch (eventAction) {
             case MotionEvent.ACTION_DOWN: // touch down so check if the finger is on
                 balID = -1;
-                for (int i = colorBalls.size() - 1; i >= 0; i--) {
-                    ColorBall ball = colorBalls.get(i);
-
-                    if (userTouchedTheBall(touchX, touchY, ball)) {
-                        balID = ball.getID();
-                    }
-                }
-                if (balID == -1) {
+                currentItemMoved = EItemMoved.NONE;
+                if (isInBallsRange(touchX, touchY)) {
+                    handleBallsTouch(touchX, touchY);
+                    currentItemMoved = EItemMoved.BALL;
+                } else if (lineButtons.isInButtonsRange(touchX, touchY)) {
                     lineButtons.handleButtonsTouch(touchX, touchY);
+                } else if (gridRect.contains(touchX, touchY)) {
+                    deltaRectMovePoint = new Point(touchX, touchY);
+                    currentItemMoved = EItemMoved.GRID_RECT;
                 }
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE: // touch drag with the ball
-                if (balID > -1) {
+                if (currentItemMoved == EItemMoved.BALL) {
                     // move the balls the same as the finger
                     lineButtons.setVisibility(false);
                     final ColorBall colorBall = colorBalls.get(balID);
                     colorBall.setX(touchX - colorBall.getRadiusOfBall());
                     colorBall.setY(touchY - colorBall.getRadiusOfBall());
-                    invalidate();
+                } else if (currentItemMoved == EItemMoved.GRID_RECT) {
+                    int dx = touchX - deltaRectMovePoint.x;
+                    int dy = touchY - deltaRectMovePoint.y;
+                    gridRect.offset(dx, dy);
+                    for (ColorBall ball : colorBalls) {
+                        ball.setX(ball.getX() + dx);
+                        ball.setY(ball.getY() + dy);
+                    }
+                    deltaRectMovePoint.set(touchX, touchY);
                 }
+                invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 lineButtons.setVisibility(true);
@@ -158,6 +170,27 @@ public class SquareView extends View {
         invalidate();
         return true;
 
+    }
+
+    private void handleBallsTouch(int touchX, int touchY) {
+        for (int i = colorBalls.size() - 1; i >= 0; i--) {
+            ColorBall ball = colorBalls.get(i);
+
+            if (userTouchedTheBall(touchX, touchY, ball)) {
+                balID = ball.getID();
+            }
+        }
+    }
+
+    private boolean isInBallsRange(int touchX, int touchY) {
+        for (int i = colorBalls.size() - 1; i >= 0; i--) {
+            ColorBall ball = colorBalls.get(i);
+
+            if (userTouchedTheBall(touchX, touchY, ball)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean userTouchedTheBall(int touchX, int touchY, ColorBall ball) {
@@ -221,6 +254,10 @@ public class SquareView extends View {
             }
         }
         return new SquareLocation(left, right, top, bottom);
+    }
+
+    public enum EItemMoved {
+        NONE, BALL, GRID_RECT
     }
 
     public static class ColorBall {
