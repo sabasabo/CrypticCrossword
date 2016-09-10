@@ -15,6 +15,7 @@ import com.liron.crypticcrossword.SquareView.SquareLocation;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,6 +49,7 @@ public class MainActivityTest {
 
     }
 
+    @Ignore
     @Test
     public void testClick() throws Throwable {
         Point size = getScreenSize();

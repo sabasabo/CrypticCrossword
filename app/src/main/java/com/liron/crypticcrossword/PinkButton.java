@@ -18,6 +18,7 @@ public class PinkButton {
     private FloatingActionButton floatingButton;
     private Activity activity;
     private SquareView squareView;
+    private ZoomDataHandler zoomDataHandler = new ZoomDataHandler();
 
     public PinkButton(Activity activity) {
         this.floatingButton = (FloatingActionButton) activity.findViewById(R.id.floatingButton);
@@ -25,6 +26,7 @@ public class PinkButton {
         this.buttonActions = new ArrayList<>(Arrays.asList(new Select(), new Ok()));
         squareView = new SquareView(activity);
         initButton();
+        zoomDataHandler.create(activity, activity.findViewById(R.id.layout));
     }
 
     public void initButton() {
@@ -73,6 +75,7 @@ public class PinkButton {
                     squareView.getSquareLocation());
             ((FrameLayout) activity.findViewById(R.id.layout)).removeView(squareView);
             ((CoordinatorLayout) activity.findViewById(R.id.superParent)).removeView(floatingButton);
+            zoomDataHandler.enable();
         }
 
         @Override

@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         Uri imgUri;
         InputStream inputStream;
 
-        // Figure out what to do based on the intent type
         try {
             // TODO: add check for uri = null or not an image
             if (Intent.ACTION_VIEW.equals(intent.getAction()) ||
@@ -62,16 +61,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -123,4 +118,5 @@ public class MainActivity extends AppCompatActivity {
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
     }
+
 }

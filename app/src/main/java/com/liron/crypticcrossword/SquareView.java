@@ -126,6 +126,7 @@ public class SquareView extends View {
 
     // events when touching the screen
     public boolean onTouchEvent(MotionEvent event) {
+        boolean isHandledTouch = false;
         int eventAction = event.getAction();
         int touchX = (int) event.getX();
         int touchY = (int) event.getY();
@@ -136,11 +137,14 @@ public class SquareView extends View {
                 if (isInBallsRange(touchX, touchY)) {
                     handleBallsTouch(touchX, touchY);
                     currentItemMoved = EItemMoved.BALL;
+                    isHandledTouch = true;
                 } else if (lineButtons.isInButtonsRange(touchX, touchY)) {
                     lineButtons.handleButtonsTouch(touchX, touchY);
+                    isHandledTouch = true;
                 } else if (gridRect.contains(touchX, touchY)) {
                     deltaRectMovePoint = new Point(touchX, touchY);
                     currentItemMoved = EItemMoved.GRID_RECT;
+                    isHandledTouch = true;
                 }
                 invalidate();
                 break;
@@ -151,6 +155,7 @@ public class SquareView extends View {
                     final ColorBall colorBall = colorBalls.get(balID);
                     colorBall.setX(touchX - colorBall.getRadiusOfBall());
                     colorBall.setY(touchY - colorBall.getRadiusOfBall());
+                    isHandledTouch = true;
                 } else if (currentItemMoved == EItemMoved.GRID_RECT) {
                     int dx = touchX - deltaRectMovePoint.x;
                     int dy = touchY - deltaRectMovePoint.y;
@@ -160,6 +165,7 @@ public class SquareView extends View {
                         ball.setY(ball.getY() + dy);
                     }
                     deltaRectMovePoint.set(touchX, touchY);
+                    isHandledTouch = true;
                 }
                 invalidate();
                 break;
@@ -168,7 +174,7 @@ public class SquareView extends View {
                 break;
         }
         invalidate();
-        return true;
+        return isHandledTouch;
 
     }
 

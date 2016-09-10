@@ -7,7 +7,6 @@ import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -92,15 +91,14 @@ public class GridLayoutView extends GridLayout {
         LayoutParams params = createParams(i);
         textView.setBackgroundColor(Color.TRANSPARENT);
         textView.setFilters(new InputFilter[]{new InputFilter.LengthFilter(1)});
-        textView.setOnTouchListener(new OnTouchListener() {
+        textView.setOnClickListener(new OnClickListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent event) {
+            public void onClick(View view) {
                 removeColorFromAllCells();
                 colorNextCells((TextView) view);
                 currentModifiedCell = (TextView) view;
                 InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(view, 0);
-                return true;
             }
         });
 
