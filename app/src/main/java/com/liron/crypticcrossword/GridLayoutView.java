@@ -1,6 +1,5 @@
 package com.liron.crypticcrossword;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.InputFilter;
@@ -13,11 +12,21 @@ import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
+import static com.liron.crypticcrossword.DataStorageHandler.GRID_TEXT;
+import static com.liron.crypticcrossword.DataStorageHandler.HEIGHT_RATIO;
+import static com.liron.crypticcrossword.DataStorageHandler.IS_SAVED_LOCATION;
+import static com.liron.crypticcrossword.DataStorageHandler.NUM_OF_COLUMNS;
+import static com.liron.crypticcrossword.DataStorageHandler.NUM_OF_ROWS;
+import static com.liron.crypticcrossword.DataStorageHandler.RIGHT_MARGIN_RATIO;
+import static com.liron.crypticcrossword.DataStorageHandler.TOP_MARGIN_RATIO;
+import static com.liron.crypticcrossword.DataStorageHandler.WIDTH_RATIO;
+
 /**
  * Created by lir on 11/06/2016.
  */
 public class GridLayoutView extends GridLayout {
     public static final int MARGIN = 10;
+    public static final String SEPARATOR = "~~";
     public TextView currentModifiedCell = null;
     public TextView firstColoredCell = null;
     private FrameLayout parentLayout;
@@ -34,31 +43,6 @@ public class GridLayoutView extends GridLayout {
         super(context, attrs);
     }
 
-    public GridLayoutView(final Activity context, int numOfRows, int numOfColumns, SquareView.SquareLocation location) {
-        super(context);
-        blackPixelIdentifier = new BlackPixelIdentifier(context);
-        parentLayout = (FrameLayout) context.findViewById(R.id.layout);
-        setRowCount(numOfRows);
-        setColumnCount(numOfColumns);
-        editTextWidth = Math.round(location.getWidth() / getColumnCount()) - 2 * MARGIN;
-        editTextHeight = Math.round(location.getHeight() / numOfRows) - 2 * MARGIN;
-        for (int i = 0; i < numOfRows * getColumnCount(); i++) {
-            createTextBox(i);
-        }
-        final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        layoutParams.rightMargin = parentLayout.getRight() - location.right;
-        layoutParams.topMargin = location.top; // - parentLayout.getTop();
-        final GridLayoutView[] gridLayoutViews = new GridLayoutView[1];
-        gridLayoutViews[0] = this;
-        context.runOnUiThread((new Runnable() {
-            @Override
-            public void run() {
-                parentLayout.addView(gridLayoutViews[0], layoutParams);
-
-            }
-        }));
-    }
-
     public boolean getIsDirectionHorizontal() {
         return directionHorizontal;
     }
@@ -67,8 +51,69 @@ public class GridLayoutView extends GridLayout {
         this.directionHorizontal = directionHorizontal;
     }
 
+    public void saveGrid(FrameLayout.LayoutParams layoutParams, SquareView.SquareLocation location) {
+        DataStorageHandler.saveData(IS_SAVED_LOCATION, true);
+        DataStorageHandler.saveData(RIGHT_MARGIN_RATIO, (float) layoutParams.rightMargin / parentLayout.getWidth());
+        DataStorageHandler.saveData(TOP_MARGIN_RATIO, (float) layoutParams.topMargin / parentLayout.getHeight());
+        DataStorageHandler.saveData(WIDTH_RATIO, (float) location.getWidth() / parentLayout.getWidth());
+        DataStorageHandler.saveData(HEIGHT_RATIO, (float) location.getHeight() / parentLayout.getHeight());
+        DataStorageHandler.saveData(NUM_OF_ROWS, getRowCount());
+        DataStorageHandler.saveData(NUM_OF_COLUMNS, getColumnCount());
+
+        saveGridText();
+    }
+
+    public void saveGridText() {
+        StringBuilder gridText = new StringBuilder();
+        for (int i = 0; i < getChildCount(); i++) {
+            gridText.append(((TextView) getChildAt(i)).getText()).append(SEPARATOR);
+        }
+        DataStorageHandler.saveData(GRID_TEXT, gridText.toString());
+    }
+
+    public void loadGrid() {
+        final FrameLayout parentLayout = (FrameLayout) getParent();
+        parentLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                int locationMarginRight = (int) ((float) DataStorageHandler.readData(RIGHT_MARGIN_RATIO) * parentLayout.getWidth());
+                int locationMarginTop = (int) ((float) DataStorageHandler.readData(TOP_MARGIN_RATIO) * parentLayout.getHeight());
+                int locationWidth = (int) ((float) DataStorageHandler.readData(WIDTH_RATIO) * parentLayout.getWidth());
+                int locationHeight = (int) ((float) DataStorageHandler.readData(HEIGHT_RATIO) * parentLayout.getHeight());
+                setRowCount((Integer) DataStorageHandler.readData(NUM_OF_ROWS));
+                setColumnCount((Integer) DataStorageHandler.readData(NUM_OF_COLUMNS));
+
+                editTextWidth = Math.round(locationWidth / getColumnCount()) - 2 * MARGIN;
+                editTextHeight = Math.round(locationHeight / getRowCount()) - 2 * MARGIN;
+
+
+                for (int i = 0; i < getRowCount() * getColumnCount(); i++) {
+                    createTextBox(i);
+                }
+                String[] gridText = ((String) DataStorageHandler.readData(GRID_TEXT)).split(SEPARATOR);
+                for (int i = 0; i < getChildCount(); i++) {
+                    final TextView textView = (TextView) getChildAt(i);
+                    textView.setText(gridText[i]);
+                    textView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            fixFontOfTextView(textView);
+                        }
+                    });
+                }
+                final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                layoutParams.rightMargin = locationMarginRight;
+                layoutParams.topMargin = locationMarginTop;
+                setLayoutParams(layoutParams);
+
+            }
+        });
+
+    }
+
+
     public void setGridValues(int numOfRows, int numOfColumns, SquareView.SquareLocation location) {
-//        blackPixelIdentifier = new BlackPixelIdentifier(context);
+        //        blackPixelIdentifier = new BlackPixelIdentifier(context);
         parentLayout = (FrameLayout) getParent();
         setRowCount(numOfRows);
         setColumnCount(numOfColumns);
@@ -79,8 +124,9 @@ public class GridLayoutView extends GridLayout {
         }
         final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParams.rightMargin = parentLayout.getRight() - location.right;
-        layoutParams.topMargin = location.top; // - parentLayout.getTop();
+        layoutParams.topMargin = location.top;
         setLayoutParams(layoutParams);
+        saveGrid(layoutParams, location);
     }
 
 
@@ -90,6 +136,7 @@ public class GridLayoutView extends GridLayout {
         textView.setTag(i);
         LayoutParams params = createParams(i);
         textView.setBackgroundColor(Color.TRANSPARENT);
+        textView.setText(" ");
         textView.setFilters(new InputFilter[]{new InputFilter.LengthFilter(1)});
         textView.setOnClickListener(new OnClickListener() {
             @Override
@@ -146,9 +193,14 @@ public class GridLayoutView extends GridLayout {
 
     private void colorCellAndFixFont(TextView nextCell) {
         nextCell.setBackgroundResource(R.drawable.select_next_cells_transperent);
-        nextCell.setTextSize(TypedValue.COMPLEX_UNIT_PX, (float) (0.9 * nextCell.getHeight()));
-        nextCell.setPadding(0, 0, 0, 0);
-        nextCell.setGravity(Gravity.CENTER);
+        fixFontOfTextView(nextCell);
+    }
+
+    public void fixFontOfTextView(TextView textView) {
+        int size = Math.min(textView.getWidth(), textView.getHeight());
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, (float) (0.9 * size));
+        textView.setPadding(0, 0, 0, 0);
+        textView.setGravity(Gravity.CENTER);
     }
 
     public void setNextCellAsCurrent() {

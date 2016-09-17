@@ -15,6 +15,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import static com.liron.crypticcrossword.DataStorageHandler.IS_SAVED_LOCATION;
+import static com.liron.crypticcrossword.DataStorageHandler.init;
+import static com.liron.crypticcrossword.DataStorageHandler.readData;
+
 public class MainActivity extends AppCompatActivity {
 
     /**
@@ -27,17 +31,25 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        init(this);
         setBoardImage();
 
         Keyboard.createKeyboard(this, R.array.hebrew);
 
-        PinkButton pinkButton = new PinkButton(this);
+        PinkButton pinkButton = new PinkButton(this, savedInstanceState != null);
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if ((boolean) readData(IS_SAVED_LOCATION, false)) {
+            ((GridLayoutView) findViewById(R.id.grid_board)).loadGrid();
+        }
+    }
 
     private void setBoardImage() {
         // Get the intent that started this activity

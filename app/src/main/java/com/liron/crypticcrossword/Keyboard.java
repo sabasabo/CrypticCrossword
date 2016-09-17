@@ -75,6 +75,7 @@ public class Keyboard {
                 if (boardGrid.currentModifiedCell != null) {
                     boardGrid.currentModifiedCell.setText(((TextView) key).getText());
                     boardGrid.setNextCellAsCurrent();
+                    boardGrid.saveGridText();
                 }
             }
         });

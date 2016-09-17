@@ -14,17 +14,23 @@ import java.util.List;
  * Created by lir on 21/05/2016.
  */
 public class PinkButton {
+    private final String IS_SAVED_LOCATION = "isSavedLocation";
     private List<ButtonAction> buttonActions;
     private FloatingActionButton floatingButton;
     private Activity activity;
     private SquareView squareView;
     private ZoomDataHandler zoomDataHandler = new ZoomDataHandler();
 
-    public PinkButton(Activity activity) {
+    public PinkButton(Activity activity, boolean isReloaded) {
         this.floatingButton = (FloatingActionButton) activity.findViewById(R.id.floatingButton);
         this.activity = activity;
-        this.buttonActions = new ArrayList<>(Arrays.asList(new Select(), new Ok()));
-        squareView = new SquareView(activity);
+        Boolean savedLoaction = (Boolean) DataStorageHandler.readData(IS_SAVED_LOCATION, false);
+        if (isReloaded && savedLoaction) {
+            buttonActions = new ArrayList<ButtonAction>(Arrays.asList(new Reload()));
+        } else {
+            buttonActions = new ArrayList<ButtonAction>(Arrays.asList(new Select(), new Ok()));
+            squareView = new SquareView(activity);
+        }
         initButton();
         zoomDataHandler.create(activity, activity.findViewById(R.id.layout));
     }
@@ -69,13 +75,29 @@ public class PinkButton {
 
         @Override
         public void doAction() {
-
             GridLayoutView gridLayoutView = (GridLayoutView) activity.findViewById(R.id.grid_board);
             gridLayoutView.setGridValues(squareView.getNumOfRows(), squareView.getNumOfColumns(),
                     squareView.getSquareLocation());
             ((FrameLayout) activity.findViewById(R.id.layout)).removeView(squareView);
             ((CoordinatorLayout) activity.findViewById(R.id.superParent)).removeView(floatingButton);
             zoomDataHandler.enable();
+        }
+
+        @Override
+        public void setImage() {
+            floatingButton.setImageResource(R.drawable.ok);
+        }
+    }
+
+    public class Reload implements ButtonAction {
+
+        @Override
+        public void doAction() {
+
+//            GridLayoutView gridLayoutView = (GridLayoutView) activity.findViewById(R.id.grid_board);
+//            gridLayoutView.loadGrid();
+            ((CoordinatorLayout) activity.findViewById(R.id.superParent)).removeView(floatingButton);
+//            zoomDataHandler.enable();
         }
 
         @Override

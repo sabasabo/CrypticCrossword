@@ -23,9 +23,6 @@ import java.util.List;
 
 public class SquareView extends View {
 
-    public static final int DEFAULT_BALLS_DISTANCE = 200;
-    public static final String RECTANGLE_EDGE_COLOR = "#AADB1255";
-    public static final String RECTANGLE_AREA_COLOR = "#55DB1255";
     public static final int[] CIRCLE_CORNERS = new int[]{R.drawable.circle2,
             R.drawable.circle2, R.drawable.circle2, R.drawable.circle2};
 
@@ -202,12 +199,6 @@ public class SquareView extends View {
     private boolean userTouchedTheBall(int touchX, int touchY, ColorBall ball) {
         return Math.sqrt(Math.pow(touchX - ball.getXCenter(), 2) +
                 Math.pow(touchY - ball.getYCenter(), 2)) < ball.getRadiusOfBall();
-    }
-
-    private boolean isInRange(int touchX, int touchY, Point circle, int radius) {
-        int centerX = circle.x + radius;
-        int centerY = circle.y + radius;
-        return Math.abs(centerX - touchX) < radius && Math.abs(centerY - touchY) < radius;
     }
 
     public void initBalls() {

@@ -3,6 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="squareViewTag">SquareView</string>
     <string name="keyboards">hebrew,numbers</string>
+    <string name="tempMemory">tempMemory</string>
     <array name="hebrew">
         <item>direction,פ,ו,ט,א,ר,ק,keyboard</item>
         <item>ל,ח,י,ע,כ,ג,ד,ש</item>
