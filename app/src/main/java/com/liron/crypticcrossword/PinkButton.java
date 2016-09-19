@@ -24,8 +24,9 @@ public class PinkButton {
     public PinkButton(Activity activity, boolean isReloaded) {
         this.floatingButton = (FloatingActionButton) activity.findViewById(R.id.floatingButton);
         this.activity = activity;
-        Boolean savedLoaction = (Boolean) DataStorageHandler.readData(IS_SAVED_LOCATION, false);
-        if (isReloaded && savedLoaction) {
+        boolean savedLoaction = (boolean) DataStorageHandler.readData(IS_SAVED_LOCATION, false);
+//        if (isReloaded && savedLoaction) {
+        if (savedLoaction) {
             buttonActions = new ArrayList<ButtonAction>(Arrays.asList(new Reload()));
         } else {
             buttonActions = new ArrayList<ButtonAction>(Arrays.asList(new Select(), new Ok()));
@@ -94,8 +95,9 @@ public class PinkButton {
         @Override
         public void doAction() {
 
-//            GridLayoutView gridLayoutView = (GridLayoutView) activity.findViewById(R.id.grid_board);
-//            gridLayoutView.loadGrid();
+            if ((boolean) DataStorageHandler.readData(IS_SAVED_LOCATION, false)) {
+                ((GridLayoutView) activity.findViewById(R.id.grid_board)).loadGrid();
+            }
             ((CoordinatorLayout) activity.findViewById(R.id.superParent)).removeView(floatingButton);
 //            zoomDataHandler.enable();
         }

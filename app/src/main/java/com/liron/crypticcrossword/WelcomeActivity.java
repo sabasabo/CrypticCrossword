@@ -16,6 +16,8 @@ import android.view.View;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import static com.liron.crypticcrossword.DataStorageHandler.IS_SAVED_LOCATION;
+
 public class WelcomeActivity extends AppCompatActivity {
 
     private Uri boardImageUri = null;
@@ -63,6 +65,8 @@ public class WelcomeActivity extends AppCompatActivity {
                 InputStream inputStream = this.getContentResolver().openInputStream(boardImageUri);
                 findViewById(R.id.previewImage).setBackground(Drawable.createFromStream(inputStream, "img"));
                 findViewById(R.id.applyImage).setVisibility(View.VISIBLE);
+                DataStorageHandler.init(this);
+                DataStorageHandler.saveData(IS_SAVED_LOCATION, false);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

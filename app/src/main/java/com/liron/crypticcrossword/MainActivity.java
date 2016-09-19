@@ -16,8 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import static com.liron.crypticcrossword.DataStorageHandler.IS_SAVED_LOCATION;
-import static com.liron.crypticcrossword.DataStorageHandler.init;
-import static com.liron.crypticcrossword.DataStorageHandler.readData;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        init(this);
+        DataStorageHandler.init(this);
         setBoardImage();
 
         Keyboard.createKeyboard(this, R.array.hebrew);
@@ -46,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if ((boolean) readData(IS_SAVED_LOCATION, false)) {
-            ((GridLayoutView) findViewById(R.id.grid_board)).loadGrid();
-        }
+//        if ((boolean) DataStorageHandler.readData(IS_SAVED_LOCATION, false)) {
+//            ((GridLayoutView) findViewById(R.id.grid_board)).loadGrid();
+//        }
     }
 
     private void setBoardImage() {
@@ -61,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
             // TODO: add check for uri = null or not an image
             if (Intent.ACTION_VIEW.equals(intent.getAction()) ||
                     Intent.ACTION_EDIT.equals(intent.getAction())) {
+                DataStorageHandler.saveData(IS_SAVED_LOCATION, false);
                 inputStream = this.getContentResolver().openInputStream(intent.getData());
             } else {
                 inputStream = this.getContentResolver().openInputStream((Uri) intent.getExtras().get("boardImageUri"));
