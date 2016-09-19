@@ -49,6 +49,12 @@ public class MainActivity extends AppCompatActivity {
 //        }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        findViewById(R.id.layout).setBackground(null);
+    }
+
     private void setBoardImage() {
         // Get the intent that started this activity
         Intent intent = getIntent();
