@@ -42,23 +42,29 @@ public class Keyboard {
         keyboardGrid.setColumnCount(keyboardLines[0].split(DELIMITER).length);
     }
 
-    private static void addKey(String letter, int row, int column) {
-        GridLayout.LayoutParams param = new GridLayout.LayoutParams();
-        param.height = 0;
-        param.width = 0;
-        param.setGravity(Gravity.CENTER);
-        param.rowSpec = GridLayout.spec(row, 1f);
-        param.columnSpec = GridLayout.spec(column, 1f);
-        final TextView key = new TextView(context);
-        key.setLayoutParams(param);
-        key.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        key.setGravity(Gravity.CENTER);
-        if (isSpecialKey(letter)) {
-            setSpecialStyleAndFunction(key, letter);
-        } else {
-            setNormalStyleAndFunction(key, letter);
-        }
-        keyboardGrid.addView(key);
+    private static void addKey(final String letter, final int row, final int column) {
+        keyboardGrid.post(new Runnable() {
+            @Override
+            public void run() {
+                GridLayout.LayoutParams param = new GridLayout.LayoutParams();
+
+                param.setGravity(Gravity.CENTER);
+                param.rowSpec = GridLayout.spec(row, 1f);
+                param.columnSpec = GridLayout.spec(column, 1f);
+                final TextView key = new TextView(context);
+                param.height = keyboardGrid.getHeight() / keyboardGrid.getRowCount();
+                param.width = keyboardGrid.getWidth() / keyboardGrid.getColumnCount();
+                key.setLayoutParams(param);
+                key.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                key.setGravity(Gravity.CENTER);
+                if (isSpecialKey(letter)) {
+                    setSpecialStyleAndFunction(key, letter);
+                } else {
+                    setNormalStyleAndFunction(key, letter);
+                }
+                keyboardGrid.addView(key);
+            }
+        });
     }
 
     private static boolean isSpecialKey(String letter) {

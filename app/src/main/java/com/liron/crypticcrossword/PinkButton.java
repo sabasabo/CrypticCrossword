@@ -99,7 +99,7 @@ public class PinkButton {
                 ((GridLayoutView) activity.findViewById(R.id.grid_board)).loadGrid();
             }
             ((CoordinatorLayout) activity.findViewById(R.id.superParent)).removeView(floatingButton);
-//            zoomDataHandler.enable();
+            zoomDataHandler.enable();
         }
 
         @Override

@@ -2,6 +2,7 @@ package com.liron.crypticcrossword;
 
 import android.content.Context;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -23,8 +24,9 @@ public class ZoomDataHandler {
     private MoveGestureDetector mMoveDetector;
     private View rootView;
     private boolean touchEnabled = false;
+    private Rect defaultLocation;
 
-    public void create(Context context, final View rootView) {
+    public void create(final Context context, final View rootView) {
         mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
         mScaleDetector.setQuickScaleEnabled(true);
         mRotateDetector = new RotateGestureDetector(context, new RotateListener());
@@ -39,11 +41,15 @@ public class ZoomDataHandler {
                         mRotateDetector.onTouchEvent(event);
                         mMoveDetector.onTouchEvent(event);
 
-                        rootView.setTranslationX(mFocusX);
-                        rootView.setTranslationY(mFocusY);
                         rootView.setScaleX(mScaleFactor);
                         rootView.setScaleY(mScaleFactor);
                         rootView.setRotation(mRotationDegrees);
+
+                        Rect visibleRect = new Rect();
+                        rootView.getLocalVisibleRect(visibleRect);
+                        System.out.println(visibleRect.right);
+
+                        setTranslation(rootView);
                     }
                 } catch (NullPointerException exception) {
                     exception.printStackTrace();
@@ -53,8 +59,29 @@ public class ZoomDataHandler {
         });
     }
 
+    private void setTranslation(View rootView) {
+//        if (rootView.getLeft() + mFocusX > defaultLocation.left) {
+//            mFocusX = defaultLocation.left - rootView.getLeft();
+//        }
+//        else if (rootView.getLeft() + mFocusX < defaultLocation.right) {
+//            mFocusX = defaultLocation.right - rootView.getRight();
+//        }
+        rootView.setTranslationX(mFocusX);
+
+//        if (rootView.getTop() + mFocusY > defaultLocation.top) {
+//            mFocusY = defaultLocation.top - rootView.getTop();
+//        }
+//        else if (rootView.getBottom() + mFocusY < defaultLocation.bottom) {
+//            mFocusY = defaultLocation.bottom - rootView.getBottom();
+//        }
+        rootView.setTranslationY(mFocusY);
+
+    }
+
     public void enable() {
         touchEnabled = true;
+        defaultLocation = new Rect(rootView.getLeft(), rootView.getTop(), rootView.getRight(), rootView.getBottom());
+
     }
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
