@@ -86,7 +86,6 @@ public class GridLayoutView extends GridLayout {
                 editTextWidth = Math.round(locationWidth / getColumnCount()) - 2 * MARGIN;
                 editTextHeight = Math.round(locationHeight / getRowCount()) - 2 * MARGIN;
 
-
                 for (int i = 0; i < getRowCount() * getColumnCount(); i++) {
                     createTextBox(i);
                 }

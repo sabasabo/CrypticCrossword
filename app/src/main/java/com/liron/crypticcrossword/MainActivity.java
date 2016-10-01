@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         Keyboard.createKeyboard(this, R.array.hebrew);
 
-        PinkButton pinkButton = new PinkButton(this, savedInstanceState != null);
+        new PinkButton(this, savedInstanceState != null);
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -56,9 +56,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setBoardImage() {
-        // Get the intent that started this activity
         Intent intent = getIntent();
-        Uri imgUri;
         InputStream inputStream;
 
         try {
@@ -115,25 +113,4 @@ public class MainActivity extends AppCompatActivity {
         );
         AppIndex.AppIndexApi.start(client, viewAction);
     }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Main Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app URL is correct.
-                Uri.parse("android-app://com.liron.crypticcrossword/http/host/path")
-        );
-        AppIndex.AppIndexApi.end(client, viewAction);
-        client.disconnect();
-    }
-
 }

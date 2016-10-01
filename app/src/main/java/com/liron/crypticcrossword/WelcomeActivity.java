@@ -75,8 +75,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
     public void applyImage(View view) {
         if (boardImageUri != null) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("boardImageUri", boardImageUri);
+            Intent intent = new Intent(this, SelectGameActivity.class);
+            intent.putExtra(getString(R.string.boardImageUri), boardImageUri);
             startActivity(intent);
         }
     }
