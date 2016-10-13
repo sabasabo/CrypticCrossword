@@ -19,7 +19,7 @@
         android:layout_weight="1"
         android:onClick="setGame"
         android:tag="@string/sudoku"
-        android:text="sudoku"
+        android:text="סודוקו"
         android:textAlignment="center"/>
 
     <TextView
@@ -29,17 +29,17 @@
         android:layout_weight="1"
         android:onClick="setGame"
         android:tag="@string/crossword"
-        android:text="crossword"
+        android:text="תשבץ"
         android:textAlignment="center"/>
 
     <TextView
-        android:id="@+id/arroword"
+        android:id="@+id/arrowword"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:onClick="setGame"
-        android:tag="@string/arroword"
-        android:text="arroword"
+        android:tag="@string/arrowword"
+        android:text="תשחץ"
         android:textAlignment="center"/>
 
     <TextView
@@ -49,6 +49,6 @@
         android:layout_weight="1"
         android:onClick="setGame"
         android:tag="@string/griddler"
-        android:text="griddler"
+        android:text="שחור ופתור"
         android:textAlignment="center"/>
 </LinearLayout>

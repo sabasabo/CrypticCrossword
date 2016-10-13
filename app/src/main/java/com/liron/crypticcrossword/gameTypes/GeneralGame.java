@@ -1,5 +1,9 @@
 package com.liron.crypticcrossword.gameTypes;
 
+import android.graphics.Color;
+import android.widget.TextView;
+
+import com.liron.crypticcrossword.GridLayoutView;
 import com.liron.crypticcrossword.R;
 
 /**
@@ -7,18 +11,35 @@ import com.liron.crypticcrossword.R;
  */
 
 public class GeneralGame implements IGame {
-    @Override
-    public int[] getKeyboards() {
-        return new int[]{R.array.hebrew, R.array.numbers};
+    private final GridLayoutView gridBoard;
+
+    public GeneralGame(GridLayoutView gridBoard) {
+        this.gridBoard = gridBoard;
     }
 
     @Override
-    public void selectCells() {
+    public Integer[] getKeyboards() {
+        return new Integer[]{R.array.hebrew, R.array.numbers};
+    }
 
+    @Override
+    public void selectCells(TextView clickedCell) {
+        removeColorFromAllCells();
     }
 
     @Override
     public void applyImageVision() {
 
+    }
+
+    @Override
+    public void afterCellEditing() {
+
+    }
+
+    private void removeColorFromAllCells() {
+        for (int i = 0; i < gridBoard.getChildCount(); i++) {
+            gridBoard.getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
+        }
     }
 }

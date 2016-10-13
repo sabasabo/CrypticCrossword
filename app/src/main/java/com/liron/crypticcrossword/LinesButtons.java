@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +30,8 @@ enum Type {
  * Created by lir on 19/08/2016.
  */
 public class LinesButtons {
+    private static final float GRID_LENGTH_TO_LINE_BALL_RATIO = 3;
+    private static ZoomDataHandler zoomDataHandler = ZoomDataHandler.getInstance();
     private boolean isVisible = false;
     private int numOfRows = 9;
     private int numOfColumns = 9;
@@ -39,11 +42,12 @@ public class LinesButtons {
                 new AddColumns(Type.ADD_COLUMN, context), new SubColumns(Type.SUB_COLUMN, context)));
     }
 
-    public void draw(Canvas canvas, Point leftBottom, Point rightTop, Paint paint) {
+    public void draw(Canvas canvas, Rect gridRect, Paint paint) {
         if (isVisible) {
+            setZoom();
             for (LinesButton linesButton : buttons) {
-                linesButton.setNewX(leftBottom, rightTop);
-                linesButton.setNewY(leftBottom, rightTop);
+                linesButton.setNewX(gridRect);
+                linesButton.setNewY(gridRect);
                 canvas.drawBitmap(linesButton.getBitmap(), linesButton.getPoint().x,
                         linesButton.getPoint().y, paint);
             }
@@ -80,23 +84,37 @@ public class LinesButtons {
         return numOfRows;
     }
 
+    public void setZoom() {
+        for (LinesButton linesButton : buttons) {
+            Bitmap originalBitmap = linesButton.getOriginalBitmap();
+            linesButton.setBitmap(Bitmap.createScaledBitmap(originalBitmap,
+                    Math.round(originalBitmap.getWidth() / zoomDataHandler.getScaleFactor()),
+                    Math.round(originalBitmap.getHeight() / zoomDataHandler.getScaleFactor()), true));
+        }
+    }
+
 
     abstract class LinesButton {
-        private Bitmap bitmap;
+        protected Bitmap bitmap;
+        private Bitmap originalBitmap;
         private Type type;
         private Point point;
 
         public LinesButton(Type type, Context context) {
             this.type = type;
-            this.bitmap = BitmapFactory.decodeResource(context.getResources(),
+            this.originalBitmap = this.bitmap = BitmapFactory.decodeResource(context.getResources(),
                     type.getId());
             this.point = new Point(0, 0);
         }
 
+        private Bitmap getOriginalBitmap() {
+            return originalBitmap;
+        }
+
         public boolean isInRange(int touchX, int touchY) {
-            int centerX = this.getPoint().x + this.getWidth();
-            int centerY = this.getPoint().y + this.getWidth();
-            return Math.abs(centerX - touchX) < this.getWidth() && Math.abs(centerY - touchY) < this.getWidth();
+            int centerX = getPoint().x + getRadius();
+            int centerY = getPoint().y + getRadius();
+            return Math.abs(centerX - touchX) < getRadius() && Math.abs(centerY - touchY) < getRadius();
         }
 
         public Bitmap getBitmap() {
@@ -107,7 +125,7 @@ public class LinesButtons {
             this.bitmap = bitmap;
         }
 
-        public int getWidth() {
+        public int getRadius() {
             return bitmap.getWidth() / 2;
         }
 
@@ -130,9 +148,9 @@ public class LinesButtons {
 
         abstract public void doAction();
 
-        protected abstract void setNewX(Point leftBottom, Point rightTop);
+        protected abstract void setNewX(Rect gridRect);
 
-        protected abstract void setNewY(Point leftBottom, Point rightTop);
+        protected abstract void setNewY(Rect gridRect);
     }
 
     public class AddRow extends LinesButton {
@@ -147,13 +165,18 @@ public class LinesButtons {
         }
 
         @Override
-        protected void setNewX(Point leftBottom, Point rightTop) {
-            this.getPoint().x = leftBottom.x - 100;
+        protected void setNewX(Rect gridRect) {
+            this.getPoint().x = gridRect.left - bitmap.getWidth();
         }
 
         @Override
-        protected void setNewY(Point leftBottom, Point rightTop) {
-            this.getPoint().y = (leftBottom.y + rightTop.y) / 2 - 100;
+        protected void setNewY(Rect gridRect) {
+            int gridHeight = gridRect.height();
+            if (gridHeight > GRID_LENGTH_TO_LINE_BALL_RATIO * bitmap.getHeight()) {
+                this.getPoint().y = gridRect.top - getRadius() + Math.round((float) gridHeight / 3);
+            } else {
+                this.getPoint().y = gridRect.centerY() - 2 * getRadius();
+            }
         }
     }
 
@@ -169,13 +192,18 @@ public class LinesButtons {
         }
 
         @Override
-        protected void setNewX(Point leftBottom, Point rightTop) {
-            this.getPoint().x = leftBottom.x - 100;
+        protected void setNewX(Rect gridRect) {
+            this.getPoint().x = gridRect.left - bitmap.getWidth();
         }
 
         @Override
-        protected void setNewY(Point leftBottom, Point rightTop) {
-            this.getPoint().y = (leftBottom.y + rightTop.y) / 2 + 100;
+        protected void setNewY(Rect gridRect) {
+            int gridHeight = gridRect.height();
+            if (gridHeight > GRID_LENGTH_TO_LINE_BALL_RATIO * bitmap.getHeight()) {
+                this.getPoint().y = gridRect.top - getRadius() + Math.round(2f * gridHeight / 3);
+            } else {
+                this.getPoint().y = gridRect.centerY();
+            }
         }
     }
 
@@ -191,13 +219,18 @@ public class LinesButtons {
         }
 
         @Override
-        protected void setNewX(Point leftBottom, Point rightTop) {
-            this.getPoint().x = (leftBottom.x + rightTop.x) / 2 + 100;
+        protected void setNewX(Rect gridRect) {
+            int gridWidth = gridRect.width();
+            if (gridWidth > GRID_LENGTH_TO_LINE_BALL_RATIO * bitmap.getWidth()) {
+                this.getPoint().x = gridRect.left - getRadius() + Math.round(2f * gridWidth / 3);
+            } else {
+                this.getPoint().x = gridRect.centerX();
+            }
         }
 
         @Override
-        protected void setNewY(Point leftBottom, Point rightTop) {
-            this.getPoint().y = rightTop.y - 100;
+        protected void setNewY(Rect gridRect) {
+            this.getPoint().y = gridRect.top - bitmap.getHeight();
         }
     }
 
@@ -208,13 +241,18 @@ public class LinesButtons {
         }
 
         @Override
-        protected void setNewX(Point leftBottom, Point rightTop) {
-            this.getPoint().x = (leftBottom.x + rightTop.x) / 2 - 100;
+        protected void setNewX(Rect gridRect) {
+            int gridWidth = gridRect.width();
+            if (gridWidth > GRID_LENGTH_TO_LINE_BALL_RATIO * bitmap.getWidth()) {
+                this.getPoint().x = gridRect.left - getRadius() + Math.round(1f * gridWidth / 3);
+            } else {
+                this.getPoint().x = gridRect.centerX() - 2 * getRadius();
+            }
         }
 
         @Override
-        protected void setNewY(Point leftBottom, Point rightTop) {
-            this.getPoint().y = rightTop.y - 100;
+        protected void setNewY(Rect gridRect) {
+            this.getPoint().y = gridRect.top - bitmap.getWidth();
         }
 
         @Override

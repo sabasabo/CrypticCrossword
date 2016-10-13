@@ -1,24 +1,22 @@
 package com.liron.crypticcrossword;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
 import static com.liron.crypticcrossword.DataStorageHandler.IS_SAVED_LOCATION;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String ROTATION_DEGREE = "rotationDegree";
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -31,8 +29,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         DataStorageHandler.init(this);
         setBoardImage();
-
-        Keyboard.createKeyboard(this, R.array.hebrew);
 
         new PinkButton(this, savedInstanceState != null);
 
@@ -52,26 +48,37 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        findViewById(R.id.layout).setBackground(null);
+        ((ImageView) findViewById(R.id.boardImage)).setImageDrawable(null);
     }
 
     private void setBoardImage() {
         Intent intent = getIntent();
-        InputStream inputStream;
+        Uri boardImageUri;
 
-        try {
-            // TODO: add check for uri = null or not an image
-            if (Intent.ACTION_VIEW.equals(intent.getAction()) ||
-                    Intent.ACTION_EDIT.equals(intent.getAction())) {
-                DataStorageHandler.saveData(IS_SAVED_LOCATION, false);
-                inputStream = this.getContentResolver().openInputStream(intent.getData());
-            } else {
-                inputStream = this.getContentResolver().openInputStream((Uri) intent.getExtras().get("boardImageUri"));
-            }
-            findViewById(R.id.layout).setBackground(Drawable.createFromStream(inputStream, "img"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+//        try {
+        // TODO: add check for uri = null or not an image
+        if (Intent.ACTION_VIEW.equals(intent.getAction()) ||
+                Intent.ACTION_EDIT.equals(intent.getAction())) {
+            DataStorageHandler.saveData(IS_SAVED_LOCATION, false);
+            boardImageUri = intent.getData();
+        } else {
+            boardImageUri = (Uri) intent.getExtras().get("boardImageUri");
         }
+        ImageView boardLayout = (ImageView) findViewById(R.id.boardImage);
+        boardLayout.setImageURI(boardImageUri);
+
+//
+//            BitmapDrawable background = (BitmapDrawable) boardLayout.getBackground();
+//            Matrix matrix = new Matrix();
+//            matrix.postRotate(((Integer) DataStorageHandler.readData(ROTATION_DEGREE, 0)).floatValue());
+//            Bitmap rotated = Bitmap.createBitmap(background.getBitmap(), (int)boardLayout.getX(), (int)boardLayout.getY(),
+//                    background.getBitmap().getRadius(), background.getBitmap().getHeight(),
+//                    matrix, true);
+//            boardLayout.setBackground(new BitmapDrawable(getResources(), rotated));
+
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -96,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        findViewById(R.id.floatingButton).performClick();
+//        findViewById(R.id.floatingButton).performClick();
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.

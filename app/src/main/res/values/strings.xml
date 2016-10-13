@@ -5,7 +5,7 @@
     <string name="keyboards">hebrew,numbers</string>
     <string name="tempMemory">tempMemory</string>
     <string name="griddler">griddler</string>
-    <string name="arroword">arroword</string>
+    <string name="arrowword">arrowword</string>
     <string name="crossword">crossword</string>
     <string name="sudoku">sudoku</string>
     <string name="gameType">gameType</string>

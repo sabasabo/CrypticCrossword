@@ -1,5 +1,9 @@
 package com.liron.crypticcrossword.gameTypes;
 
+import android.graphics.Color;
+import android.widget.TextView;
+
+import com.liron.crypticcrossword.GridLayoutView;
 import com.liron.crypticcrossword.R;
 
 /**
@@ -7,18 +11,37 @@ import com.liron.crypticcrossword.R;
  */
 
 public class Sudoku implements IGame {
-    @Override
-    public int[] getKeyboards() {
-        return new int[]{R.array.numbers};
+    private final GridLayoutView gridBoard;
+
+    public Sudoku(GridLayoutView gridBoard) {
+        this.gridBoard = gridBoard;
     }
 
     @Override
-    public void selectCells() {
+    public Integer[] getKeyboards() {
+        return new Integer[]{R.array.numbers};
+    }
 
+    @Override
+    public void selectCells(TextView clickedCell) {
+        removeColorFromAllCells();
+        gridBoard.firstColoredCell = clickedCell;
+        gridBoard.colorCellAndFixFont((TextView) gridBoard.getChildAt((Integer) clickedCell.getTag()));
     }
 
     @Override
     public void applyImageVision() {
 
+    }
+
+    @Override
+    public void afterCellEditing() {
+
+    }
+
+    private void removeColorFromAllCells() {
+        for (int i = 0; i < gridBoard.getChildCount(); i++) {
+            gridBoard.getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
+        }
     }
 }

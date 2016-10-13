@@ -3,9 +3,11 @@ package com.liron.crypticcrossword;
 import android.app.Activity;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,12 +20,18 @@ public class Keyboard {
     private static GridLayout keyboardGrid;
     private static Activity context;
     private static String currentKeyboardName;
+    private static List<Integer> keyboards;
 
-    static void createKeyboard(Activity activity, int keyboardId) {
+    static void createKeyboard(Activity activity, Integer... keyboardIds) {
         keyboardGrid = (GridLayout) activity.findViewById(R.id.keyboard);
+        if (keyboardIds.length == 0) {
+            ((ViewGroup) keyboardGrid.getParent()).removeView(keyboardGrid);
+            return;
+        }
         context = activity;
-        currentKeyboardName = context.getResources().getResourceEntryName(keyboardId);
-        String[] keyboardLines = activity.getResources().getStringArray(keyboardId);
+        keyboards = new ArrayList<>(Arrays.asList(keyboardIds));
+        currentKeyboardName = context.getResources().getResourceEntryName(keyboardIds[0]);
+        String[] keyboardLines = activity.getResources().getStringArray(keyboardIds[0]);
         setGridDimensions(keyboardLines);
         int rowIndex = 0;
         for (String line : keyboardLines) {
@@ -79,9 +87,7 @@ public class Keyboard {
             @Override
             public void onClick(View key) {
                 if (boardGrid.currentModifiedCell != null) {
-                    boardGrid.currentModifiedCell.setText(((TextView) key).getText());
-                    boardGrid.setNextCellAsCurrent();
-                    boardGrid.saveGridText();
+                    boardGrid.setTextInCurrentCell((String) ((TextView) key).getText());
                 }
             }
         });
@@ -100,7 +106,6 @@ public class Keyboard {
                     } else {
                         key.setBackgroundResource(R.drawable.border_arrow_down);
                     }
-                    boardGrid.removeColorFromAllCells();
                     boardGrid.setIsDirectionHorizontal(!boardGrid.getIsDirectionHorizontal());
                     boardGrid.currentModifiedCell = boardGrid.firstColoredCell;
                     boardGrid.colorNextCells(boardGrid.firstColoredCell);
@@ -112,10 +117,8 @@ public class Keyboard {
                 @Override
                 public void onClick(View key) {
                     keyboardGrid.removeAllViews();
-                    List<String> keyboards = Arrays.asList(context.getResources().getString(R.string.keyboards).split(","));
-                    int index = (keyboards.indexOf(currentKeyboardName) + 1) % keyboards.size();
-                    int id = context.getResources().getIdentifier(keyboards.get(index), "array", context.getPackageName());
-                    createKeyboard(context, id);
+                    keyboards.add(keyboards.remove(0));
+                    createKeyboard(context, keyboards.toArray(new Integer[0]));
                 }
             });
         }

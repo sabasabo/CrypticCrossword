@@ -1,10 +1,9 @@
 package com.liron.crypticcrossword;
 
 import android.app.Activity;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +18,7 @@ public class PinkButton {
     private FloatingActionButton floatingButton;
     private Activity activity;
     private SquareView squareView;
-    private ZoomDataHandler zoomDataHandler = new ZoomDataHandler();
+    private ZoomDataHandler zoomDataHandler = ZoomDataHandler.getInstance();
 
     public PinkButton(Activity activity, boolean isReloaded) {
         this.floatingButton = (FloatingActionButton) activity.findViewById(R.id.floatingButton);
@@ -33,7 +32,8 @@ public class PinkButton {
             squareView = new SquareView(activity);
         }
         initButton();
-        zoomDataHandler.create(activity, activity.findViewById(R.id.layout));
+        zoomDataHandler.create(activity, (ViewGroup) activity.findViewById(R.id.boardParent));
+        zoomDataHandler.enable();
     }
 
     public void initButton() {
@@ -44,9 +44,9 @@ public class PinkButton {
                 buttonActions.remove(0);
                 if (buttonActions.isEmpty()) {
                     floatingButton.setOnClickListener(null);
-                    return;
+                } else {
+                    buttonActions.get(0).setImage();
                 }
-                buttonActions.get(0).setImage();
             }
         });
     }
@@ -61,9 +61,8 @@ public class PinkButton {
 
         @Override
         public void doAction() {
-            ((FrameLayout) activity.findViewById(R.id.layout)).addView(squareView);
-            View board = activity.findViewById(R.id.layout);
-            squareView.initBalls();
+            ((ViewGroup) activity.findViewById(R.id.boardParent)).addView(squareView);
+            squareView.initBalls(zoomDataHandler.getScaleFactor(), zoomDataHandler.getFocusX(), zoomDataHandler.getFocusY());
         }
 
         @Override
@@ -79,9 +78,9 @@ public class PinkButton {
             GridLayoutView gridLayoutView = (GridLayoutView) activity.findViewById(R.id.grid_board);
             gridLayoutView.setGridValues(squareView.getNumOfRows(), squareView.getNumOfColumns(),
                     squareView.getSquareLocation());
-            ((FrameLayout) activity.findViewById(R.id.layout)).removeView(squareView);
-            ((CoordinatorLayout) activity.findViewById(R.id.superParent)).removeView(floatingButton);
-            zoomDataHandler.enable();
+            ((ViewGroup) activity.findViewById(R.id.boardParent)).removeView(squareView);
+            ((ViewGroup) floatingButton.getParent()).removeView(floatingButton);
+//            zoomDataHandler.enable();
         }
 
         @Override
@@ -98,8 +97,8 @@ public class PinkButton {
             if ((boolean) DataStorageHandler.readData(IS_SAVED_LOCATION, false)) {
                 ((GridLayoutView) activity.findViewById(R.id.grid_board)).loadGrid();
             }
-            ((CoordinatorLayout) activity.findViewById(R.id.superParent)).removeView(floatingButton);
-            zoomDataHandler.enable();
+            ((ViewGroup) floatingButton.getParent()).removeView(floatingButton);
+//            zoomDataHandler.enable();
         }
 
         @Override

@@ -21,13 +21,11 @@ public class DataStorageHandler {
     private static Activity activityContext;
 
     public static Object readData(String dataName) {
-        SharedPreferences sharedPreferences = getTempSharedPreferences();
-        return sharedPreferences.getAll().get(dataName);
+        return getTempSharedPreferences().getAll().get(dataName);
     }
 
     public static Object readData(String dataName, Object defaultValue) {
-        SharedPreferences sharedPreferences = getTempSharedPreferences();
-        Object data = sharedPreferences.getAll().get(dataName);
+        Object data = getTempSharedPreferences().getAll().get(dataName);
         if (data == null) {
             return defaultValue;
         }
@@ -40,16 +38,15 @@ public class DataStorageHandler {
     }
 
     public static void saveData(String dataName, Object data) {
-        SharedPreferences sharedPreferences = getTempSharedPreferences();
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        SharedPreferences.Editor editor = getTempSharedPreferences().edit();
         putDataInEditor(editor, dataName, data);
         editor.commit();
     }
 
-    public static void removeData(String... dataName) {
-        for (String name : dataName) {
-            saveData(name, null);
-        }
+    public static void removeOldData() {
+        SharedPreferences.Editor editor = getTempSharedPreferences().edit();
+        editor.clear();
+        editor.commit();
     }
 
     private static void putDataInEditor(SharedPreferences.Editor editor, String dataName, Object data) {
@@ -67,4 +64,5 @@ public class DataStorageHandler {
     public static void init(Activity context) {
         activityContext = context;
     }
+
 }

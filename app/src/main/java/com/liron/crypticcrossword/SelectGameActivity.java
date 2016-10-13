@@ -14,6 +14,7 @@ public class SelectGameActivity extends AppCompatActivity {
     }
 
     public void setGame(View view) {
+        // TODO: make WellcomeActivity be the launcher for edited games instead of this.
         Intent intent = getIntent();
         intent.setClass(this, MainActivity.class);
         intent.putExtra(getString(R.string.gameType), (String) view.getTag());

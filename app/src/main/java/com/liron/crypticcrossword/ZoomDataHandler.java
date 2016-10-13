@@ -2,10 +2,10 @@ package com.liron.crypticcrossword;
 
 import android.content.Context;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.almeros.android.multitouch.MoveGestureDetector;
 import com.almeros.android.multitouch.RotateGestureDetector;
@@ -14,19 +14,45 @@ import com.almeros.android.multitouch.RotateGestureDetector;
  * Created by lir on 10/09/2016.
  */
 public class ZoomDataHandler {
+    private static ZoomDataHandler instance = null;
     private float mScaleFactor = 1.0f;
     private float mRotationDegrees = 0.f;
     private float mFocusX = 0.f;
     private float mFocusY = 0.f;
-
     private ScaleGestureDetector mScaleDetector;
     private RotateGestureDetector mRotateDetector;
     private MoveGestureDetector mMoveDetector;
-    private View rootView;
+    private ViewGroup rootView;
     private boolean touchEnabled = false;
-    private Rect defaultLocation;
 
-    public void create(final Context context, final View rootView) {
+    private ZoomDataHandler() {
+    }
+
+    public static ZoomDataHandler getInstance() {
+        if (instance == null) {
+            instance = new ZoomDataHandler();
+        }
+        return instance;
+    }
+
+    public float getScaleFactor() {
+        return mScaleFactor;
+    }
+
+    public float getRotationDegrees() {
+        return mRotationDegrees;
+    }
+
+    public float getFocusX() {
+        return mFocusX;
+    }
+
+    public float getFocusY() {
+        return mFocusY;
+    }
+//    private Rect defaultLocation;
+
+    public void create(final Context context, final ViewGroup rootView) {
         mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
         mScaleDetector.setQuickScaleEnabled(true);
         mRotateDetector = new RotateGestureDetector(context, new RotateListener());
@@ -45,11 +71,10 @@ public class ZoomDataHandler {
                         rootView.setScaleY(mScaleFactor);
                         rootView.setRotation(mRotationDegrees);
 
-                        Rect visibleRect = new Rect();
-                        rootView.getLocalVisibleRect(visibleRect);
-                        System.out.println(visibleRect.right);
-
                         setTranslation(rootView);
+                        for (int i = 0; i < rootView.getChildCount(); i++) {
+                            rootView.getChildAt(i).invalidate();
+                        }
                     }
                 } catch (NullPointerException exception) {
                     exception.printStackTrace();
@@ -57,6 +82,12 @@ public class ZoomDataHandler {
                 return true;
             }
         });
+//        rootView.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                defaultLocation = new Rect(rootView.getLeft(), rootView.getTop(), rootView.getRight(), rootView.getBottom());
+//            }
+//        });
     }
 
     private void setTranslation(View rootView) {
@@ -80,8 +111,6 @@ public class ZoomDataHandler {
 
     public void enable() {
         touchEnabled = true;
-        defaultLocation = new Rect(rootView.getLeft(), rootView.getTop(), rootView.getRight(), rootView.getBottom());
-
     }
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {

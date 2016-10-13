@@ -15,6 +15,18 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="4">
+        <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:background="#00ff00"-->
+        <!--android:layout_weight="4">-->
+
+        <include layout="@layout/content_main"/>
+
+        <!--<android.support.design.widget.CoordinatorLayout-->
+        <!--android:id="@+id/superParent"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
 
         <!--<android.support.design.widget.AppBarLayout-->
         <!--android:layout_width="match_parent"-->
@@ -30,7 +42,6 @@
 
         <!--</android.support.design.widget.AppBarLayout>-->
 
-        <include layout="@layout/content_main"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/floatingButton"
@@ -41,6 +52,9 @@
             android:src="@android:drawable/ic_menu_compass"/>
 
     </android.support.design.widget.CoordinatorLayout>
+
+
+    <!--</RelativeLayout>-->
 
     <GridLayout
         android:id="@+id/keyboard"

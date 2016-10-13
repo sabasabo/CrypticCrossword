@@ -4,6 +4,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageView;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -20,6 +24,7 @@ import static com.liron.crypticcrossword.DataStorageHandler.IS_SAVED_LOCATION;
 
 public class WelcomeActivity extends AppCompatActivity {
 
+    public static final String ROTATION_DEGREE = "rotationDegree";
     private Uri boardImageUri = null;
 
     @Override
@@ -63,9 +68,10 @@ public class WelcomeActivity extends AppCompatActivity {
             try {
                 boardImageUri = data.getData();
                 InputStream inputStream = this.getContentResolver().openInputStream(boardImageUri);
-                findViewById(R.id.previewImage).setBackground(Drawable.createFromStream(inputStream, "img"));
+                ((ImageView) findViewById(R.id.previewImage)).setImageDrawable(Drawable.createFromStream(inputStream, "img"));
                 findViewById(R.id.applyImage).setVisibility(View.VISIBLE);
                 DataStorageHandler.init(this);
+                DataStorageHandler.removeOldData();
                 DataStorageHandler.saveData(IS_SAVED_LOCATION, false);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -79,5 +85,33 @@ public class WelcomeActivity extends AppCompatActivity {
             intent.putExtra(getString(R.string.boardImageUri), boardImageUri);
             startActivity(intent);
         }
+    }
+
+    public void rotateLeft(View view) {
+        rotateImage(270);
+    }
+
+    public void rotateRight(View view) {
+        rotateImage(90);
+    }
+
+    private void rotateImage(int degree) {
+
+//        matrix.postRotate(degree);
+        ImageView previewImage = (ImageView) findViewById(R.id.previewImage);
+        BitmapDrawable background = (BitmapDrawable) previewImage.getDrawable();
+//
+//        Bitmap scaledBitmap = Bitmap.createScaledBitmap(background.getBitmap(), previewImage.getRadius(),previewImage.getHeight(),true);
+//
+//        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getRadius(), scaledBitmap.getHeight(), matrix, true);
+//        previewImage.setImageBitmap(rotatedBitmap);
+        int degreeToSave = ((Integer) DataStorageHandler.readData(ROTATION_DEGREE, 0) + degree) % 360;
+        DataStorageHandler.saveData(ROTATION_DEGREE, degreeToSave);
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotated = Bitmap.createBitmap(background.getBitmap(), 0, 0,
+                background.getBitmap().getWidth(), background.getBitmap().getHeight(),
+                matrix, true);
+        previewImage.setImageBitmap(rotated);
     }
 }

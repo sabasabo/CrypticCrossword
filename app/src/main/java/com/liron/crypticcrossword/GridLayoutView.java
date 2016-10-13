@@ -1,5 +1,6 @@
 package com.liron.crypticcrossword;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.InputFilter;
@@ -7,10 +8,14 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
 import android.widget.GridLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.liron.crypticcrossword.gameTypes.GameTypeFactory;
+import com.liron.crypticcrossword.gameTypes.IGame;
 
 import static com.liron.crypticcrossword.DataStorageHandler.GRID_TEXT;
 import static com.liron.crypticcrossword.DataStorageHandler.HEIGHT_RATIO;
@@ -29,18 +34,31 @@ public class GridLayoutView extends GridLayout {
     public static final String SEPARATOR = "~~";
     public TextView currentModifiedCell = null;
     public TextView firstColoredCell = null;
-    private FrameLayout parentLayout;
+    private ViewGroup parentLayout;
     private int editTextWidth;
     private int editTextHeight;
     private BlackPixelIdentifier blackPixelIdentifier;
     private boolean directionHorizontal = true;
+    private IGame gameType;
 
     public GridLayoutView(Context context) {
         super(context);
+        setGameType();
     }
 
     public GridLayoutView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setGameType();
+    }
+
+    private void setGameType() {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                gameType = GameTypeFactory.createGame((Activity) getContext());
+                Keyboard.createKeyboard((Activity) getContext(), gameType.getKeyboards());
+            }
+        });
     }
 
     public boolean getIsDirectionHorizontal() {
@@ -51,7 +69,7 @@ public class GridLayoutView extends GridLayout {
         this.directionHorizontal = directionHorizontal;
     }
 
-    public void saveGrid(FrameLayout.LayoutParams layoutParams, SquareView.SquareLocation location) {
+    public void saveGrid(RelativeLayout.LayoutParams layoutParams, SquareView.SquareLocation location) {
         DataStorageHandler.saveData(IS_SAVED_LOCATION, true);
         DataStorageHandler.saveData(RIGHT_MARGIN_RATIO, (float) layoutParams.rightMargin / parentLayout.getWidth());
         DataStorageHandler.saveData(TOP_MARGIN_RATIO, (float) layoutParams.topMargin / parentLayout.getHeight());
@@ -59,7 +77,7 @@ public class GridLayoutView extends GridLayout {
         DataStorageHandler.saveData(HEIGHT_RATIO, (float) location.getHeight() / parentLayout.getHeight());
         DataStorageHandler.saveData(NUM_OF_ROWS, getRowCount());
         DataStorageHandler.saveData(NUM_OF_COLUMNS, getColumnCount());
-
+        // TODO: might need to save gameType type
         saveGridText();
     }
 
@@ -72,7 +90,7 @@ public class GridLayoutView extends GridLayout {
     }
 
     public void loadGrid() {
-        final FrameLayout parentLayout = (FrameLayout) getParent();
+        final ViewGroup parentLayout = (ViewGroup) getParent();
         parentLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -100,20 +118,19 @@ public class GridLayoutView extends GridLayout {
                         }
                     });
                 }
-                final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
                 layoutParams.rightMargin = locationMarginRight;
                 layoutParams.topMargin = locationMarginTop;
                 setLayoutParams(layoutParams);
-
+                // TODO: might need to load gameType type
             }
         });
-
     }
 
 
     public void setGridValues(int numOfRows, int numOfColumns, SquareView.SquareLocation location) {
         //        blackPixelIdentifier = new BlackPixelIdentifier(context);
-        parentLayout = (FrameLayout) getParent();
+        parentLayout = (ViewGroup) getParent();
         setRowCount(numOfRows);
         setColumnCount(numOfColumns);
         editTextWidth = Math.round(location.getWidth() / getColumnCount()) - 2 * MARGIN;
@@ -121,11 +138,12 @@ public class GridLayoutView extends GridLayout {
         for (int i = 0; i < numOfRows * getColumnCount(); i++) {
             createTextBox(i);
         }
-        final FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParams.rightMargin = parentLayout.getRight() - location.right;
         layoutParams.topMargin = location.top;
         setLayoutParams(layoutParams);
         saveGrid(layoutParams, location);
+        gameType.applyImageVision();
     }
 
 
@@ -140,7 +158,6 @@ public class GridLayoutView extends GridLayout {
         textView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                removeColorFromAllCells();
                 colorNextCells((TextView) view);
                 currentModifiedCell = (TextView) view;
                 InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -169,28 +186,12 @@ public class GridLayoutView extends GridLayout {
         this.addView(textView, params);
     }
 
-    public void removeColorFromAllCells() {
-        for (int i = 0; i < getChildCount(); i++) {
-            getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
-        }
-    }
 
     public void colorNextCells(TextView cell) {
-        firstColoredCell = cell;
-        Integer index = (Integer) cell.getTag();
-        if (directionHorizontal) {
-            int lastCell = (index / getColumnCount() + 1) * getColumnCount();
-            for (int i = index; i < lastCell; i++) {
-                colorCellAndFixFont((TextView) getChildAt(i));
-            }
-        } else {
-            for (int i = index; i < getChildCount(); i += getColumnCount()) {
-                colorCellAndFixFont((TextView) getChildAt(i));
-            }
-        }
+        gameType.selectCells(cell);
     }
 
-    private void colorCellAndFixFont(TextView nextCell) {
+    public void colorCellAndFixFont(TextView nextCell) {
         nextCell.setBackgroundResource(R.drawable.select_next_cells_transperent);
         fixFontOfTextView(nextCell);
     }
@@ -202,19 +203,6 @@ public class GridLayoutView extends GridLayout {
         textView.setGravity(Gravity.CENTER);
     }
 
-    public void setNextCellAsCurrent() {
-        Integer index = (Integer) currentModifiedCell.getTag();
-        if (directionHorizontal) {
-            if (index % getColumnCount() < getColumnCount() - 1) {
-                currentModifiedCell = (TextView) getChildAt(index + 1);
-            }
-        } else {
-            if (index + getColumnCount() < getChildCount()) {
-                currentModifiedCell = (TextView) getChildAt(index + getColumnCount());
-            }
-        }
-    }
-
     private LayoutParams createParams(int i) {
         Spec row = GridLayout.spec(i / getColumnCount(), 1, 1f);
         Spec col = GridLayout.spec(i % getColumnCount(), 1, 1f);
@@ -223,5 +211,11 @@ public class GridLayoutView extends GridLayout {
         params.height = editTextHeight;
         params.setMargins(MARGIN, MARGIN, MARGIN, MARGIN);
         return params;
+    }
+
+    public void setTextInCurrentCell(String text) {
+        currentModifiedCell.setText(text);
+        gameType.afterCellEditing();
+        saveGridText();
     }
 }

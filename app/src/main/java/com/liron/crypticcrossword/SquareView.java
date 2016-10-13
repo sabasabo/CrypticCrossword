@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.view.Display;
@@ -25,7 +24,7 @@ public class SquareView extends View {
 
     public static final int[] CIRCLE_CORNERS = new int[]{R.drawable.circle2,
             R.drawable.circle2, R.drawable.circle2, R.drawable.circle2};
-
+    private static ZoomDataHandler zoomDataHandler = ZoomDataHandler.getInstance();
     private final boolean IS_USING_RECT = true;
     Paint paint = new Paint();
     private Point[] points = new Point[4];
@@ -36,10 +35,17 @@ public class SquareView extends View {
     private Rect gridRect = new Rect();
     private Point deltaRectMovePoint = null;
     private EItemMoved currentItemMoved = EItemMoved.NONE;
+
     public SquareView(Context context) {
         super(context);
         setTag(getContext().getString(R.string.squareViewTag));
         setFocusable(true); // necessary for getting the touch events
+    }
+
+    private static Bitmap getScaledBitmap(Bitmap bitmap) {
+        return Bitmap.createScaledBitmap(bitmap,
+                Math.round(bitmap.getWidth() / zoomDataHandler.getScaleFactor()),
+                Math.round(bitmap.getHeight() / zoomDataHandler.getScaleFactor()), true);
     }
 
     @Override
@@ -48,7 +54,7 @@ public class SquareView extends View {
 //            return;
 //        }
         drawSelectionRectangle(canvas);
-        lineButtons.draw(canvas, colorBalls.get(1).point, colorBalls.get(3).point, paint);
+        lineButtons.draw(canvas, gridRect, paint);
         drawCorners(canvas);
     }
 
@@ -67,21 +73,23 @@ public class SquareView extends View {
             }
             createPathGrid(gridRect, canvas);
             paint.setColor(Color.WHITE);
-            paint.setStrokeWidth(10);
+            paint.setStrokeWidth(10 / zoomDataHandler.getScaleFactor());
             canvas.drawRect(gridRect, paint);
         } else {
-            Path path = new Path();
-            path.moveTo(colorBall1.getXCenter(), colorBall1.getYCenter());
-            path.lineTo(colorBall2.getXCenter(), colorBall2.getYCenter());
-            path.lineTo(colorBall3.getXCenter(), colorBall3.getYCenter());
-            path.lineTo(colorBall4.getXCenter(), colorBall4.getYCenter());
-            path.close();
-            canvas.drawPath(path, paint);
+//            Path path = new Path();
+//            path.moveTo(colorBall1.getXCenter(), colorBall1.getYCenter());
+//            path.lineTo(colorBall2.getXCenter(), colorBall2.getYCenter());
+//            path.lineTo(colorBall3.getXCenter(), colorBall3.getYCenter());
+//            path.lineTo(colorBall4.getXCenter(), colorBall4.getYCenter());
+//            path.close();
+//            canvas.drawPath(path, paint);
         }
     }
 
     private void drawCorners(Canvas canvas) {
         if (IS_USING_RECT) {
+            colorBalls.get(1).scaleBall();
+            colorBalls.get(3).scaleBall();
             canvas.drawBitmap(colorBalls.get(1).getBitmap(), colorBalls.get(1).getX(),
                     colorBalls.get(1).getY(), paint);
             canvas.drawBitmap(colorBalls.get(3).getBitmap(), colorBalls.get(3).getX(),
@@ -102,7 +110,7 @@ public class SquareView extends View {
     private void createPathGrid(Rect rect, Canvas canvas) {
         //draw stroke
         paint.setColor(Color.GRAY);
-        paint.setStrokeWidth(5);
+        paint.setStrokeWidth(5 / zoomDataHandler.getScaleFactor());
         int widthStep = rect.width() / getNumOfColumns();
         int heightStep = rect.height() / getNumOfRows();
         for (int i = rect.left + widthStep; i < rect.right && widthStep > 0; i += widthStep) {
@@ -143,9 +151,10 @@ public class SquareView extends View {
                     currentItemMoved = EItemMoved.GRID_RECT;
                     isHandledTouch = true;
                 }
+                // TODO: handle the case where lineButtons are pressed
                 invalidate();
                 break;
-            case MotionEvent.ACTION_MOVE: // touch drag with the ball
+            case MotionEvent.ACTION_MOVE:
                 if (currentItemMoved == EItemMoved.BALL) {
                     // move the balls the same as the finger
                     lineButtons.setVisibility(false);
@@ -168,9 +177,10 @@ public class SquareView extends View {
                 break;
             case MotionEvent.ACTION_UP:
                 lineButtons.setVisibility(true);
+                invalidate();
                 break;
         }
-        invalidate();
+//        invalidate();
         return isHandledTouch;
 
     }
@@ -201,15 +211,15 @@ public class SquareView extends View {
                 Math.pow(touchY - ball.getYCenter(), 2)) < ball.getRadiusOfBall();
     }
 
-    public void initBalls() {
+    public void initBalls(float zoom, float locationChangeX, float locationChangeY) {
         WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        int x = size.x / 2;
-        int y = size.y / 3;
-        int distanceX = (int) (size.x * 0.5);
-        int distanceY = (int) (size.y * 0.3);
+        int x = (int) (size.x / 2 - locationChangeX);
+        int y = (int) (size.y / 3 - locationChangeY);
+        int distanceX = (int) (size.x * 0.5 / zoomDataHandler.getScaleFactor());
+        int distanceY = (int) (size.y * 0.3 / zoomDataHandler.getScaleFactor());
         points[0] = new Point();
         points[0].x = x - distanceX / 2;
         points[0].y = y - distanceY / 2;
@@ -259,23 +269,37 @@ public class SquareView extends View {
 
     public static class ColorBall {
 
+        private final Point originPoint;
         private Bitmap bitmap;
+        private Bitmap originalBitmap;
         private Point point;
         private int id;
 
         public ColorBall(Context context, int resourceId, Point point, int id) {
             this.id = id;
-            bitmap = BitmapFactory.decodeResource(context.getResources(),
+            originalBitmap = BitmapFactory.decodeResource(context.getResources(),
                     resourceId);
+            bitmap = getScaledBitmap(originalBitmap);
+            originPoint = point;
+
             this.point = point;
+
         }
 
         public int getXCenter() {
             return point.x + getRadiusOfBall();
         }
 
+        public void scaleBall() {
+            bitmap = getScaledBitmap(originalBitmap);
+        }
+
         public int getYCenter() {
             return point.y + getRadiusOfBall();
+        }
+
+        public Point getCenterPoint() {
+            return new Point(getXCenter(), getYCenter());
         }
 
         public int getRadiusOfBall() {
