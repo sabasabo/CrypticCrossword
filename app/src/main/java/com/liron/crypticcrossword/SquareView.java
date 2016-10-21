@@ -56,6 +56,22 @@ public class SquareView extends View {
         drawSelectionRectangle(canvas);
         lineButtons.draw(canvas, gridRect, paint);
         drawCorners(canvas);
+        drawLineNumbers(canvas);
+    }
+
+    private void drawLineNumbers(Canvas canvas) {
+//        EditText rowsNumber = new EditText(getContext());
+//        EditText columnsNumber = new EditText(getContext());
+//        TextView textBetween = new TextView(getContext());
+
+//        rowsNumber.setText(getNumOfRows());
+//        columnsNumber.setText(getNumOfColumns());
+//        textBetween.setText(" X ");
+        paint.setColor(Color.GREEN);
+        paint.setTextSize(Math.min(gridRect.width(), gridRect.height()) / 9f);
+        paint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText(getNumOfRows() + " X " + getNumOfColumns(), gridRect.centerX(), gridRect.centerY(), paint);
+        gridRect.centerX();
     }
 
     private void drawSelectionRectangle(Canvas canvas) {
@@ -211,7 +227,7 @@ public class SquareView extends View {
                 Math.pow(touchY - ball.getYCenter(), 2)) < ball.getRadiusOfBall();
     }
 
-    public void initBalls(float zoom, float locationChangeX, float locationChangeY) {
+    public void initBalls(float locationChangeX, float locationChangeY) {
         WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
         Point size = new Point();
@@ -220,7 +236,7 @@ public class SquareView extends View {
         int y = (int) (size.y / 3 - locationChangeY);
         int distanceX = (int) (size.x * 0.5 / zoomDataHandler.getScaleFactor());
         int distanceY = (int) (size.y * 0.3 / zoomDataHandler.getScaleFactor());
-        setRotation(-zoomDataHandler.getScaleFactor());
+        setRotation(-zoomDataHandler.getRotationDegrees());
         points[0] = new Point();
         points[0].x = x - distanceX / 2;
         points[0].y = y - distanceY / 2;

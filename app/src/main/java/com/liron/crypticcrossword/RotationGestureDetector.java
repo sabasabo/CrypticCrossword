@@ -53,13 +53,16 @@ public class RotationGestureDetector {
                 break;
             case MotionEvent.ACTION_UP:
                 ptrID1 = INVALID_POINTER_ID;
+                mListener.onFinishRotation(this);
                 break;
             case MotionEvent.ACTION_POINTER_UP:
                 ptrID2 = INVALID_POINTER_ID;
+                mListener.onFinishRotation(this);
                 break;
             case MotionEvent.ACTION_CANCEL:
                 ptrID1 = INVALID_POINTER_ID;
                 ptrID2 = INVALID_POINTER_ID;
+                mListener.onFinishRotation(this);
                 break;
         }
         return true;
@@ -77,5 +80,7 @@ public class RotationGestureDetector {
 
     public interface OnRotationGestureListener {
         void onRotation(RotationGestureDetector rotationDetector);
+
+        void onFinishRotation(RotationGestureDetector rotationDetector);
     }
 }

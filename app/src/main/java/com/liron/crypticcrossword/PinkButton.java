@@ -64,7 +64,7 @@ public class PinkButton {
         @Override
         public void doAction() {
             ((ViewGroup) activity.findViewById(R.id.boardParent)).addView(squareView);
-            squareView.initBalls(zoomDataHandler.getScaleFactor(), zoomDataHandler.getFocusX(), zoomDataHandler.getFocusY());
+            squareView.initBalls(zoomDataHandler.getFocusX(), zoomDataHandler.getFocusY());
         }
 
         @Override
