@@ -220,6 +220,7 @@ public class SquareView extends View {
         int y = (int) (size.y / 3 - locationChangeY);
         int distanceX = (int) (size.x * 0.5 / zoomDataHandler.getScaleFactor());
         int distanceY = (int) (size.y * 0.3 / zoomDataHandler.getScaleFactor());
+        setRotation(-zoomDataHandler.getScaleFactor());
         points[0] = new Point();
         points[0].x = x - distanceX / 2;
         points[0].y = y - distanceY / 2;

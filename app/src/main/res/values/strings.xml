@@ -17,6 +17,6 @@
     </array>
     <array name="numbers">
         <item>5,4,3,2,1,keyboard</item>
-        <item>0,9,8,7,6,delete</item>
+        <item>0,9,8,7,6,</item>
     </array>
 </resources>

@@ -1,22 +1,26 @@
 package com.liron.crypticcrossword;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 
-import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
+
+import java.io.IOException;
 
 import static com.liron.crypticcrossword.DataStorageHandler.IS_SAVED_LOCATION;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String ROTATION_DEGREE = "rotationDegree";
+//    public static final String ROTATION_DEGREE = "rotationDegree";
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -53,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setBoardImage() {
         Intent intent = getIntent();
-        Uri boardImageUri;
+        final Uri boardImageUri;
 
 //        try {
         // TODO: add check for uri = null or not an image
@@ -64,17 +68,37 @@ public class MainActivity extends AppCompatActivity {
         } else {
             boardImageUri = (Uri) intent.getExtras().get("boardImageUri");
         }
-        ImageView boardLayout = (ImageView) findViewById(R.id.boardImage);
-        boardLayout.setImageURI(boardImageUri);
+        final ImageView boardImage = (ImageView) findViewById(R.id.boardImage);
+        final View boardParent = findViewById(R.id.boardParent);
+        boardImage.post(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+//                   BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(getContentResolver().openInputStream(boardImageUri), false);
+//                    bitmap = decoder.decodeRegion(new Rect(10, 10, 50, 50), null);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), boardImageUri);
+
+                    int newHeight = (int) Math.floor(bitmap.getHeight() * (boardParent.getWidth() / (float) bitmap.getWidth()));
+                    Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, boardParent.getWidth(), newHeight, true);
+                    boardImage.setImageBitmap(newBitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        });
+
 
 //
-//            BitmapDrawable background = (BitmapDrawable) boardLayout.getBackground();
+//            BitmapDrawable background = (BitmapDrawable) boardImage.getBackground();
 //            Matrix matrix = new Matrix();
 //            matrix.postRotate(((Integer) DataStorageHandler.readData(ROTATION_DEGREE, 0)).floatValue());
-//            Bitmap rotated = Bitmap.createBitmap(background.getBitmap(), (int)boardLayout.getX(), (int)boardLayout.getY(),
+//            Bitmap rotated = Bitmap.createBitmap(background.getBitmap(), (int)boardImage.getX(), (int)boardImage.getY(),
 //                    background.getBitmap().getRadius(), background.getBitmap().getHeight(),
 //                    matrix, true);
-//            boardLayout.setBackground(new BitmapDrawable(getResources(), rotated));
+//            boardImage.setBackground(new BitmapDrawable(getResources(), rotated));
 
 //        } catch (FileNotFoundException e) {
 //            e.printStackTrace();
@@ -97,27 +121,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-//        findViewById(R.id.floatingButton).performClick();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Main Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app URL is correct.
-                Uri.parse("android-app://com.liron.crypticcrossword/http/host/path")
-        );
-        AppIndex.AppIndexApi.start(client, viewAction);
     }
 }

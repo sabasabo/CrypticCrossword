@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +33,8 @@ public class PinkButton {
             squareView = new SquareView(activity);
         }
         initButton();
-        zoomDataHandler.create(activity, (ViewGroup) activity.findViewById(R.id.boardParent));
+        zoomDataHandler.create(activity, (ViewGroup) activity.findViewById(R.id.boardParent),
+                (ImageView) activity.findViewById(R.id.boardImage));
         zoomDataHandler.enable();
     }
 
