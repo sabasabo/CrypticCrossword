@@ -50,9 +50,6 @@ public class SquareView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-//        if (points[3] == null) { //point4 null when user did not touch and move on screen.
-//            return;
-//        }
         drawSelectionRectangle(canvas);
         lineButtons.draw(canvas, gridRect, paint);
         drawCorners(canvas);
@@ -70,6 +67,7 @@ public class SquareView extends View {
         paint.setColor(Color.GREEN);
         paint.setTextSize(Math.min(gridRect.width(), gridRect.height()) / 9f);
         paint.setTextAlign(Paint.Align.CENTER);
+        paint.setShadowLayer(gridRect.height() / 9f, 2f, 2f, Color.BLACK);
         canvas.drawText(getNumOfRows() + " X " + getNumOfColumns(), gridRect.centerX(), gridRect.centerY(), paint);
         gridRect.centerX();
     }

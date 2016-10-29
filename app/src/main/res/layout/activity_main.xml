@@ -42,15 +42,32 @@
 
         <!--</android.support.design.widget.AppBarLayout>-->
 
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/floatingButton"
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|left"
-            android:layout_margin="@dimen/fab_margin"
-            android:src="@android:drawable/ic_menu_compass"/>
+            android:layout_margin="@dimen/fab_margin">
 
+            <TextView
+                android:id="@+id/floatingButtonText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:elevation="7dp"
+                android:shadowColor="#000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="10"
+                android:textAlignment="center"
+                android:textColor="#ffffff"
+                android:textSize="12sp"/>
+
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/floatingButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </FrameLayout>
     </android.support.design.widget.CoordinatorLayout>
 
 

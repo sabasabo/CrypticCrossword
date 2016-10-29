@@ -11,6 +11,7 @@ public class SelectGameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_game);
+        findViewById(R.id.activity_select_game);
     }
 
     public void setGame(View view) {
@@ -20,4 +21,6 @@ public class SelectGameActivity extends AppCompatActivity {
         intent.putExtra(getString(R.string.gameType), (String) view.getTag());
         startActivity(intent);
     }
+
+
 }

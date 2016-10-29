@@ -5,6 +5,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,17 +16,18 @@ import java.util.List;
  */
 public class PinkButton {
     private final String IS_SAVED_LOCATION = "isSavedLocation";
+    private final TextView textViewOnButton;
     private List<ButtonAction> buttonActions;
     private FloatingActionButton floatingButton;
     private Activity activity;
     private SquareView squareView;
     private ZoomDataHandler zoomDataHandler = ZoomDataHandler.getInstance();
 
-    public PinkButton(Activity activity, boolean isReloaded) {
+    public PinkButton(Activity activity) {
         this.floatingButton = (FloatingActionButton) activity.findViewById(R.id.floatingButton);
+        textViewOnButton = (TextView) activity.findViewById(R.id.floatingButtonText);
         this.activity = activity;
         boolean savedLoaction = (boolean) DataStorageHandler.readData(IS_SAVED_LOCATION, false);
-//        if (isReloaded && savedLoaction) {
         if (savedLoaction) {
             buttonActions = new ArrayList<ButtonAction>(Arrays.asList(new Reload()));
         } else {
@@ -39,6 +41,7 @@ public class PinkButton {
     }
 
     public void initButton() {
+        buttonActions.get(0).setImage();
         floatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -61,6 +64,8 @@ public class PinkButton {
 
     public class Select implements ButtonAction {
 
+        public static final String TEXT = "סמן לוח";
+
         @Override
         public void doAction() {
             ((ViewGroup) activity.findViewById(R.id.boardParent)).addView(squareView);
@@ -69,11 +74,13 @@ public class PinkButton {
 
         @Override
         public void setImage() {
-            floatingButton.setImageResource(R.drawable.table_only);
+            textViewOnButton.setText(TEXT);
         }
     }
 
     public class Ok implements ButtonAction {
+
+        public static final String TEXT = "סיים";
 
         @Override
         public void doAction() {
@@ -87,7 +94,7 @@ public class PinkButton {
 
         @Override
         public void setImage() {
-            floatingButton.setImageResource(R.drawable.ok);
+            textViewOnButton.setText(TEXT);
         }
     }
 

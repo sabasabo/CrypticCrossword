@@ -4,10 +4,10 @@
     <string name="squareViewTag">SquareView</string>
     <string name="keyboards">hebrew,numbers</string>
     <string name="tempMemory">tempMemory</string>
-    <string name="griddler">griddler</string>
-    <string name="arrowword">arrowword</string>
-    <string name="crossword">crossword</string>
-    <string name="sudoku">sudoku</string>
+    <string name="griddler">griddler-שחור ופתור</string>
+    <string name="arrowword">arrowword-תשחץ</string>
+    <string name="crossword">crossword-תשבץ</string>
+    <string name="sudoku">sudoku-סודוקו</string>
     <string name="gameType">gameType</string>
     <string name="boardImageUri">boardImageUri</string>
     <array name="hebrew">
