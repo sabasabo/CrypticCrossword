@@ -88,7 +88,9 @@ public class PinkButton {
             gridLayoutView.setGridValues(squareView.getNumOfRows(), squareView.getNumOfColumns(),
                     squareView.getSquareLocation());
             ((ViewGroup) activity.findViewById(R.id.boardParent)).removeView(squareView);
-            ((ViewGroup) floatingButton.getParent()).removeView(floatingButton);
+            ViewGroup parent = (ViewGroup) floatingButton.getParent();
+            parent.removeView(floatingButton);
+            parent.removeView(textViewOnButton);
 //            zoomDataHandler.enable();
         }
 
