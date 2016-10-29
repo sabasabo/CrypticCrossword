@@ -86,7 +86,7 @@ public class PinkButton {
         public void doAction() {
             GridLayoutView gridLayoutView = (GridLayoutView) activity.findViewById(R.id.grid_board);
             gridLayoutView.setGridValues(squareView.getNumOfRows(), squareView.getNumOfColumns(),
-                    squareView.getSquareLocation());
+                    squareView.getSquareLocation(), squareView.getRotation());
             ((ViewGroup) activity.findViewById(R.id.boardParent)).removeView(squareView);
             ViewGroup parent = (ViewGroup) floatingButton.getParent();
             parent.removeView(floatingButton);

@@ -1,20 +1,15 @@
 package com.liron.crypticcrossword;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
-
-import java.io.IOException;
 
 import static com.liron.crypticcrossword.DataStorageHandler.IS_SAVED_LOCATION;
 
@@ -69,26 +64,7 @@ public class MainActivity extends AppCompatActivity {
             boardImageUri = (Uri) intent.getExtras().get("boardImageUri");
         }
         final ImageView boardImage = (ImageView) findViewById(R.id.boardImage);
-        final View boardParent = findViewById(R.id.boardParent);
-        boardImage.post(new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-//                   BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(getContentResolver().openInputStream(boardImageUri), false);
-//                    bitmap = decoder.decodeRegion(new Rect(10, 10, 50, 50), null);
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), boardImageUri);
-
-                    int newHeight = (int) Math.floor(bitmap.getHeight() * (boardParent.getWidth() / (float) bitmap.getWidth()));
-                    Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, boardParent.getWidth(), newHeight, true);
-                    boardImage.setImageBitmap(newBitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-        });
+        ImageUtils.setImageMatchParentWithRatio(boardImageUri, boardImage, this);
 
 
 //

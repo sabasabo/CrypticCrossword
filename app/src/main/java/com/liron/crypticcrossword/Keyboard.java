@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class Keyboard {
     public static final String DELIMITER = ",";
-    private static final List<String> SPECIAL_KEYWORDS = Arrays.asList("direction", "keyboard");
+    private static final List<String> SPECIAL_KEYWORDS = Arrays.asList("direction", "keyboard", "language");
     private static GridLayout keyboardGrid;
     private static Activity context;
     private static String currentKeyboardName;
@@ -113,6 +113,16 @@ public class Keyboard {
             });
         } else if (specialWord.equals("keyboard")) {
             key.setBackgroundResource(R.drawable.keyboard_icon);
+            key.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View key) {
+                    keyboardGrid.removeAllViews();
+                    keyboards.add(keyboards.remove(0));
+                    createKeyboard(context, keyboards.toArray(new Integer[0]));
+                }
+            });
+        } else if (specialWord.equals("language")) {
+            key.setBackgroundResource(R.drawable.earth_icon_keyboard);
             key.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View key) {

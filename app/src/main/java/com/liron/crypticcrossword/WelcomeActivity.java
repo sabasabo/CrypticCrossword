@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,14 +13,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
 import static com.liron.crypticcrossword.DataStorageHandler.IS_SAVED_LOCATION;
 
 public class WelcomeActivity extends AppCompatActivity {
 
-    //    public static final String ROTATION_DEGREE = "rotationDegree";
     private Uri boardImageUri = null;
 
     @Override
@@ -62,17 +57,13 @@ public class WelcomeActivity extends AppCompatActivity {
                 //Display an error
                 return;
             }
-            try {
-                boardImageUri = data.getData();
-                InputStream inputStream = this.getContentResolver().openInputStream(boardImageUri);
-                ((ImageView) findViewById(R.id.previewImage)).setImageDrawable(Drawable.createFromStream(inputStream, "img"));
-                findViewById(R.id.applyImage).setVisibility(View.VISIBLE);
-                DataStorageHandler.init(this);
-                DataStorageHandler.removeOldData();
-                DataStorageHandler.saveData(IS_SAVED_LOCATION, false);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+            boardImageUri = data.getData();
+            ImageUtils.setImageMatchParentWithRatio(boardImageUri, ((ImageView) findViewById(R.id.previewImage)), this);
+
+            findViewById(R.id.applyImage).setVisibility(View.VISIBLE);
+            DataStorageHandler.init(this);
+            DataStorageHandler.removeOldData();
+            DataStorageHandler.saveData(IS_SAVED_LOCATION, false);
         }
     }
 

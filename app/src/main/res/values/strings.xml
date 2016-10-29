@@ -10,13 +10,27 @@
     <string name="sudoku">sudoku-סודוקו</string>
     <string name="gameType">gameType</string>
     <string name="boardImageUri">boardImageUri</string>
-    <array name="hebrew">
-        <item>direction,פ,ו,ט,א,ר,ק,keyboard</item>
-        <item>ל,ח,י,ע,כ,ג,ד,ש</item>
-        <item>ת,צ,מ,נ,ה,ב,ס,ז</item>
+    <array name="lettersOnly_hebrew">
+        <item>language,ק,ר,א,ט,ו,פ,direction</item>
+        <item>ש,ד,ג,כ,ע,י,ח,ל</item>
+        <item>ז,ס,ב,ה,נ,מ,צ,ת</item>
+    </array>
+    <array name="lettersOnly_english">
+        <item>Q,W,E,R,T,Y,U,I,O,P</item>
+        <item>A,S,D,F,G,H,J,K,L, </item>
+        <item>direction,Z,X,C,V,B,N,M,language, </item>
+    </array>
+    <array name="numbersOnly">
+        <item>1,2,3,4,5</item>
+        <item>6,7,8,9, </item>
+    </array>
+    <array name="letters">
+        <item>direction,ק,ר,א,ט,ו,פ,keyboard</item>
+        <item>ש,ד,ג,כ,ע,י,ח,ל</item>
+        <item>ז,ס,ב,ה,נ,מ,צ,ת</item>
     </array>
     <array name="numbers">
-        <item>5,4,3,2,1,keyboard</item>
-        <item>0,9,8,7,6,</item>
+        <item>1,2,3,4,5,keyboard</item>
+        <item>6,7,8,9,0, </item>
     </array>
 </resources>

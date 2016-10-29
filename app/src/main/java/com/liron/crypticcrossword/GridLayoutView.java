@@ -30,7 +30,7 @@ import static com.liron.crypticcrossword.DataStorageHandler.WIDTH_RATIO;
  * Created by lir on 11/06/2016.
  */
 public class GridLayoutView extends GridLayout {
-    public static final int MARGIN = 10;
+    public static final int MARGIN = 3;
     public static final String SEPARATOR = "~~";
     public TextView currentModifiedCell = null;
     public TextView firstColoredCell = null;
@@ -128,11 +128,12 @@ public class GridLayoutView extends GridLayout {
     }
 
 
-    public void setGridValues(int numOfRows, int numOfColumns, SquareView.SquareLocation location) {
+    public void setGridValues(int numOfRows, int numOfColumns, SquareView.SquareLocation location, float rotation) {
         //        blackPixelIdentifier = new BlackPixelIdentifier(context);
         parentLayout = (ViewGroup) getParent();
         setRowCount(numOfRows);
         setColumnCount(numOfColumns);
+        setRotation(rotation);
         editTextWidth = Math.round(location.getWidth() / getColumnCount()) - 2 * MARGIN;
         editTextHeight = Math.round(location.getHeight() / numOfRows) - 2 * MARGIN;
         for (int i = 0; i < numOfRows * getColumnCount(); i++) {
@@ -169,17 +170,8 @@ public class GridLayoutView extends GridLayout {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
-//                    if (blackPixelIdentifier.isBlack(view, parentLayout)) {
-//                        view.setVisibility(View.INVISIBLE);
-//                        view.setFocusable(false);
-//                        view.setClickable(false);
-//                    } else {
                     TextView textView = (TextView) view;
                     textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textView.getHeight());
-//                        TextKeyListener.clear(textView.getText());
-//                        textResizerView.setText(textView.getText());
-//                        textView.setTextSize(textResizerView.getTextSize());
-//                    }
                 }
             }
         });

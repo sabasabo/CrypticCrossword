@@ -68,13 +68,6 @@
             android:padding="10dp"
             android:visibility="invisible">
 
-            <!--<ImageView-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:onClick="rotateLeft"-->
-            <!--android:src="@drawable/rotate_left"/>-->
-
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -82,13 +75,6 @@
                 android:layout_weight="4"
                 android:onClick="applyImage"
                 android:src="@drawable/ok_green"/>
-
-            <!--<ImageView-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:onClick="rotateRight"-->
-            <!--android:src="@drawable/rotate_right"/>-->
         </LinearLayout>
     </LinearLayout>
 

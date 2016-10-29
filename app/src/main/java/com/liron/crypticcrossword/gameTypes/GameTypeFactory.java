@@ -16,7 +16,7 @@ public class GameTypeFactory {
     private static Map<String, Class<? extends IGame>> gameTypes;
 
     public static IGame createGame(Activity activity) {
-        String gameType = activity.getIntent().getExtras().getString(activity.getString(R.string.gameType));
+        String gameType = activity.getIntent().getExtras().getString(activity.getString(R.string.gameType)).split("-")[0];
         GridLayoutView gridBoard = (GridLayoutView) activity.findViewById(R.id.grid_board);
         IGame game;
         switch (gameType) {

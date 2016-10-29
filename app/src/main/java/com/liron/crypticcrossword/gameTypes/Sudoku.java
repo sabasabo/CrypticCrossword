@@ -19,7 +19,7 @@ public class Sudoku implements IGame {
 
     @Override
     public Integer[] getKeyboards() {
-        return new Integer[]{R.array.numbers};
+        return new Integer[]{R.array.numbersOnly};
     }
 
     @Override

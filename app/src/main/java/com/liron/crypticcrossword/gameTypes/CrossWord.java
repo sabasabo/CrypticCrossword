@@ -27,7 +27,7 @@ public class CrossWord implements IGame {
 
     @Override
     public Integer[] getKeyboards() {
-        return new Integer[]{R.array.hebrew};
+        return new Integer[]{R.array.lettersOnly_hebrew, R.array.lettersOnly_english};
     }
 
     @Override

@@ -19,7 +19,7 @@ public class GeneralGame implements IGame {
 
     @Override
     public Integer[] getKeyboards() {
-        return new Integer[]{R.array.hebrew, R.array.numbers};
+        return new Integer[]{R.array.letters, R.array.numbers};
     }
 
     @Override
