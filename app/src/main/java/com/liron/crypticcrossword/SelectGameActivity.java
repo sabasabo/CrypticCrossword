@@ -11,7 +11,8 @@ public class SelectGameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_game);
-        findViewById(R.id.activity_select_game);
+        getSupportActionBar().setTitle("");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public void setGame(View view) {
@@ -22,5 +23,15 @@ public class SelectGameActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case android.R.id.home:
+//                NavUtils.navigateUpFromSameTask(this);
+//                return true;
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+//
+//    }
 }

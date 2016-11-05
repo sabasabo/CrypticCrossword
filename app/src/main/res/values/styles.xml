@@ -8,6 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!--<style name="WelcomeAppTheme" parent="AppTheme">-->
+    <!--<item name="homeAsUpIndicator">@drawable/action_exit_icon</item>-->
+    <!--</style>-->
+
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>

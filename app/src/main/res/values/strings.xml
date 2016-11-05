@@ -10,6 +10,8 @@
     <string name="sudoku">sudoku-סודוקו</string>
     <string name="gameType">gameType</string>
     <string name="boardImageUri">boardImageUri</string>
+    <string name="share">share</string>
+    <string name="save">save</string>
     <array name="lettersOnly_hebrew">
         <item>language,ק,ר,א,ט,ו,פ,direction</item>
         <item>ש,ד,ג,כ,ע,י,ח,ל</item>

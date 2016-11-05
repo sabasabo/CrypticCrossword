@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -23,6 +24,11 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wellcome);
+        getSupportActionBar().setTitle("");
+//        getSupportActionBar().setHomeAsUpIndicator(R.drawable.action_exit);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
+//        getSupportActionBar().setCustomView(R.layout.menu_action_bar);
     }
 
     public void selectImageFromGallery(View view) {
@@ -102,4 +108,15 @@ public class WelcomeActivity extends AppCompatActivity {
 //                matrix, true);
 //        previewImage.setImageBitmap(rotated);
 //    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }
